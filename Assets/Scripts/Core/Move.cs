@@ -2,17 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Move : MonoBehaviour
+[System.Serializable]
+public class Move
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public string name;           // e.g., "Surge"
+    public string description;    // Tooltip or hint
+    public MoveType type;         // Attack, Defense, etc.
+}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+public enum MoveType
+{
+    Attack,
+    Defense,
+    Repeat,
+    Mirror,
+    Bluff
 }
