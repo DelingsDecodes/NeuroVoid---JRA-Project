@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 // Adaptive AI that tracks player behavior and selects strategic responses.
 
 public class AIManager : MonoBehaviour
