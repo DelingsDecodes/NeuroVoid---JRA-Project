@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+using TMPro;
 
 // Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts.
 
@@ -9,8 +9,8 @@ public class UIManager : MonoBehaviour
     public GameManager gameManager;
 
     public Button[] moveButtons; // 5 buttons for Surge, Disrupt (cards)
-    public Text aiTauntText;
-    public Text roundCounterText;
+    public TextMeshProUGUI aiTauntText;
+    public TextMeshProUGUI roundCounterText;
 
     private Move[] availableMoves;
 
