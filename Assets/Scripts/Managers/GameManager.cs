@@ -19,14 +19,42 @@ public class GameManager : MonoBehaviour
     public bool gameEnded = false;
 
     void Start()
-    {
-        currentRound = 0;
-        playerWins = 0;
-        aiWins = 0;
-        gameEnded = false;
-    }
+{
+    Debug.Log("GameManager Start() running");
 
-    /// Called when the player selects a move via UI.
+    currentRound = 0;
+    playerWins = 0;
+    aiWins = 0;
+    gameEnded = false;
+
+    // TEMP: Hardcoded moves for testing
+    allMoves = new Move[]
+    {
+        new Move { name = "Surge", description = "Attack", type = MoveType.Attack },
+        new Move { name = "Disrupt", description = "Defend", type = MoveType.Defense },
+        new Move { name = "Loop", description = "Repeat", type = MoveType.Repeat },
+        new Move { name = "Fracture", description = "Mirror", type = MoveType.Mirror },
+        new Move { name = "Null", description = "Bluff", type = MoveType.Bluff }
+    };
+
+    // Set the buttons
+    FindObjectOfType<UIManager>().SetAvailableMoves(allMoves);
+
+    // Simulate profile 
+    PlayerProfile tempProfile = new PlayerProfile
+    {
+        prefersAggression = true,
+        prefersControl = false,
+        seeksRevenge = false,
+        oftenBluffs = false,
+        fearsPredictability = false
+    };
+
+    FindObjectOfType<AIManager>().Initialize(tempProfile);
+}
+
+
+    // Called when the player selects a move via UI.
 
     public void PlayerSelectedMove(Move selectedMove)
     {
@@ -49,7 +77,7 @@ public class GameManager : MonoBehaviour
     }
 
  
-    /// Compare moves to determine round winner (basic logic for now).
+    // Compare moves to determine round winner (basic logic for now).
     
     private void ResolveRound(Move playerMove, Move aiMove)
     {
