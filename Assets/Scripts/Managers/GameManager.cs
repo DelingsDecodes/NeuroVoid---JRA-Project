@@ -6,7 +6,8 @@ public class GameManager : MonoBehaviour
     public PlayerManager playerManager;
     public AIManager aiManager;
     public MemoryLog memoryLog;
-    public QuestionnaireManager questionnaireManager; //  Assign this via Inspector
+    public QuestionnaireManager questionnaireManager;
+    public PostGameSummary postGameSummary; // NEW: summary component
 
     public Move[] allMoves;
     private TauntGenerator tauntGenerator;
@@ -18,7 +19,8 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager Start() running");
 
-        if (uiManager == null || playerManager == null || aiManager == null || memoryLog == null || questionnaireManager == null)
+        if (uiManager == null || playerManager == null || aiManager == null ||
+            memoryLog == null || questionnaireManager == null || postGameSummary == null)
         {
             Debug.LogError("GameManager: Missing references in Inspector.");
             return;
@@ -31,7 +33,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        PlayerProfile profile = questionnaireManager.GetProfile(); // Pull actual answers
+        PlayerProfile profile = questionnaireManager.GetProfile(); // Get profile from quiz
         aiManager.Initialize(profile);
         tauntGenerator = new TauntGenerator(profile, memoryLog);
 
@@ -73,8 +75,12 @@ public class GameManager : MonoBehaviour
     private void EndGame()
     {
         Debug.Log("Game Over");
+
         Move prediction = aiManager.PredictFinalMove(allMoves);
         string result = $"Game over. My final prediction is: {prediction.name}";
         uiManager.DisplayAITaunt(result);
+
+        // Show post-game analysis
+        postGameSummary.ShowSummary(allMoves, prediction);
     }
 }

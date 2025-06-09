@@ -15,18 +15,19 @@ public class MemoryLog : MonoBehaviour
     private List<RoundRecord> history = new List<RoundRecord>();
 
     public void LogRound(int round, Move playerMove, Move aiMove, string outcome = "")
+{
+    RoundRecord record = new RoundRecord
     {
-        RoundRecord record = new RoundRecord
-        {
-            roundNumber = round,
-            playerMove = playerMove.name,
-            aiMove = aiMove.name,
-            outcome = outcome
-        };
+        roundNumber = round,
+        playerMove = playerMove.name,
+        aiMove = aiMove.name,
+        outcome = outcome
+    };
 
-        history.Add(record);
-        Debug.Log($"[MemoryLog] Round {round}: Player - {record.playerMove}, AI - {record.aiMove}, Outcome - {outcome}");
-    }
+    history.Add(record);
+    Debug.Log($"[MemoryLog] Round {round}: Player - {record.playerMove}, AI - {record.aiMove}, Outcome - {outcome}");
+}
+
 
     public List<RoundRecord> GetHistory()
     {
