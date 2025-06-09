@@ -1,38 +1,29 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Handles player's data and move history.
 public class PlayerManager : MonoBehaviour
 {
-    public List<Move> moveHistory = new List<Move>();  // Stores all past moves
-    public Move currentMove;                           // Current selected move
+    public List<Move> moveHistory = new List<Move>();
 
-    //Call this when the player selects a move (e.g. by clicking a button).
-
-    public void SelectMove(Move selectedMove)
+    // Adds a player move to the history
+    public void AddMove(Move move)
     {
-        currentMove = selectedMove;
-        moveHistory.Add(selectedMove);
-
-        Debug.Log("Player selected move: " + selectedMove.name);
+        moveHistory.Add(move);
+        Debug.Log($" Player move recorded: {move.name}");
     }
 
-
-    // Returns the last move the player made (null if none).
-  
+    // Optional: Returns the last move made
     public Move GetLastMove()
     {
-        if (moveHistory.Count == 0)
-            return null;
-
-        return moveHistory[moveHistory.Count - 1];
+        if (moveHistory.Count > 0)
+            return moveHistory[moveHistory.Count - 1];
+        return null;
     }
 
-    // Clears all move history (for a new game).
-
+    // Clears history (e.g. for restart)
     public void ResetHistory()
     {
         moveHistory.Clear();
-        currentMove = null;
     }
 }
