@@ -1,49 +1,62 @@
 using System.Collections.Generic;
 using UnityEngine;
-
-/// Tracks every round of the game for memory analysis and UI display.
+using System.Linq;
 
 public class MemoryLog : MonoBehaviour
 {
-    [System.Serializable]
-    public class RoundEntry
+    public class RoundRecord
     {
         public int roundNumber;
-        public Move playerMove;
-        public Move aiMove;
-        public string result;  // e.g., "Player Win", "AI Win", "Draw", "Bluff Success"
+        public string playerMove;
+        public string aiMove;
+        public string outcome; // e.g., "Win", "Lose", "Draw"
     }
 
-    public List<RoundEntry> roundHistory = new List<RoundEntry>();
+    private List<RoundRecord> history = new List<RoundRecord>();
 
-    public void LogRound(int round, Move playerMove, Move aiMove, string result)
+    public void LogRound(int round, Move playerMove, Move aiMove, string outcome = "")
     {
-        RoundEntry entry = new RoundEntry
+        RoundRecord record = new RoundRecord
         {
             roundNumber = round,
-            playerMove = playerMove,
-            aiMove = aiMove,
-            result = result
+            playerMove = playerMove.name,
+            aiMove = aiMove.name,
+            outcome = outcome
         };
 
-        roundHistory.Add(entry);
+        history.Add(record);
+        Debug.Log($"[MemoryLog] Round {round}: Player - {record.playerMove}, AI - {record.aiMove}, Outcome - {outcome}");
+    }
 
-        Debug.Log($"[MemoryLog] Round {round}: Player = {playerMove.name}, AI = {aiMove.name}, Result = {result}");
+    public List<RoundRecord> GetHistory()
+    {
+        return history;
     }
 
     public void ClearLog()
     {
-        roundHistory.Clear();
+        history.Clear();
     }
 
-    public RoundEntry GetLastRound()
+    //  Return the last N moves from history
+    public List<RoundRecord> GetLastNMoves(int n)
     {
-        if (roundHistory.Count == 0) return null;
-        return roundHistory[roundHistory.Count - 1];
+        return history.Skip(Mathf.Max(0, history.Count - n)).ToList();
     }
 
-    public List<RoundEntry> GetFullLog()
+    // Estimate how often passive moves were used
+    public float GetPassiveMoveRate()
     {
-        return roundHistory;
+        int passiveCount = history.Count(r => r.playerMove == "Loop" || r.playerMove == "Null");
+        return history.Count == 0 ? 0f : (float)passiveCount / history.Count;
+    }
+
+    // Detect same move used 3 times in a row
+    public bool HasStraightPattern()
+    {
+        if (history.Count < 3) return false;
+
+        var last3 = GetLastNMoves(3);
+        return last3.All(r => r.playerMove == last3[0].playerMove);
     }
 }

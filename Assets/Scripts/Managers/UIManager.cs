@@ -2,8 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 
-// Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts.
-
+// Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts, and summary.
 public class UIManager : MonoBehaviour
 {
     public GameManager gameManager;
@@ -16,48 +15,54 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI aiTauntText;              // Where the AI taunts appear
     public TextMeshProUGUI roundCounterText;         // Round info display
 
+    [Header("Post-Game Summary UI")]
+    public GameObject summaryPanel;                  // Panel object that shows the final summary
+    public TextMeshProUGUI summaryText;              // Text display inside the summary panel
+
     private Move[] availableMoves;
 
     public void SetAvailableMoves(Move[] moves)
-{
-    Debug.Log($" SetAvailableMoves called with {moves.Length} moves");
-
-    if (moveButtons.Length != moves.Length || moveButtonLabels.Length != moves.Length)
     {
-        Debug.LogError($"UIManager: Array mismatch. " +
-            $"Buttons = {moveButtons.Length}, Labels = {moveButtonLabels.Length}, Moves = {moves.Length}");
-        return;
+        if (moves == null || moves.Length == 0)
+        {
+            Debug.LogError("UIManager: No moves provided to SetAvailableMoves.");
+            return;
+        }
+
+        if (moveButtons.Length != moves.Length || moveButtonLabels.Length != moves.Length)
+        {
+            Debug.LogError($"UIManager: Array size mismatch. " +
+                $"Buttons = {moveButtons.Length}, Labels = {moveButtonLabels.Length}, Moves = {moves.Length}");
+            return;
+        }
+
+        availableMoves = moves;
+        Debug.Log($"SetAvailableMoves called with {moves.Length} moves");
+
+        for (int i = 0; i < moves.Length; i++)
+        {
+            int index = i;
+
+            if (moveButtonLabels[i] != null)
+            {
+                moveButtonLabels[i].text = moves[i].name;
+            }
+            else
+            {
+                Debug.LogWarning($"UIManager: Missing label for button {i}.");
+            }
+
+            if (moveButtons[i] != null)
+            {
+                moveButtons[i].onClick.RemoveAllListeners(); // Avoid stacking listeners
+                moveButtons[i].onClick.AddListener(() => OnMoveButtonClicked(index));
+            }
+            else
+            {
+                Debug.LogWarning($"UIManager: Missing button at index {i}.");
+            }
+        }
     }
-
-    availableMoves = moves;
-
-    for (int i = 0; i < moves.Length; i++)
-    {
-        int index = i;
-
-        Debug.Log($"Button {i}: Set label to {moves[i].name}");
-
-        if (moveButtonLabels[i] != null)
-        {
-            moveButtonLabels[i].text = moves[i].name;
-        }
-        else
-        {
-            Debug.LogWarning($"UIManager: Missing label for button {i}.");
-        }
-
-        if (moveButtons[i] != null)
-        {
-            moveButtons[i].onClick.RemoveAllListeners(); // Ensure no stacking
-            moveButtons[i].onClick.AddListener(() => OnMoveButtonClicked(index));
-        }
-        else
-        {
-            Debug.LogWarning($"UIManager: Missing button at index {i}.");
-        }
-    }
-}
-
 
     private void OnMoveButtonClicked(int index)
     {
@@ -77,6 +82,10 @@ public class UIManager : MonoBehaviour
         {
             aiTauntText.text = message;
         }
+        else
+        {
+            Debug.LogWarning("UIManager: aiTauntText not assigned.");
+        }
     }
 
     public void UpdateRoundCounter(int round, int total)
@@ -84,6 +93,24 @@ public class UIManager : MonoBehaviour
         if (roundCounterText != null)
         {
             roundCounterText.text = $"Round {round} / {total}";
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: roundCounterText not assigned.");
+        }
+    }
+
+    // Called by PostGameSummary to show end-of-duel breakdown
+    public void DisplaySummary(string message)
+    {
+        if (summaryText != null && summaryPanel != null)
+        {
+            summaryText.text = message;
+            summaryPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: summaryText or summaryPanel not assigned.");
         }
     }
 }

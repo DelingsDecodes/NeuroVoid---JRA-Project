@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-
 // Adaptive AI that tracks player behavior and selects strategic responses.
-
 public class AIManager : MonoBehaviour
 {
     public PlayerProfile profile;
@@ -27,36 +24,71 @@ public class AIManager : MonoBehaviour
 
     public Move DecideMove(Move[] availableMoves)
     {
+        if (availableMoves == null || availableMoves.Length == 0)
+        {
+            Debug.LogWarning("AIManager: No available moves provided.");
+            return null;
+        }
+
+        // EARLY GAME: use questionnaire profile to bias behavior
         if (playerMoveHistory.Count == 0)
         {
-            if (profile != null && profile.prefersAggression)
-                return FindMove(availableMoves, MoveType.Defense);
-            else
-                return FindMove(availableMoves, MoveType.Attack);
-        }
-        else
-        {
-            Move lastPlayerMove = playerMoveHistory[playerMoveHistory.Count - 1];
-
-            foreach (Move move in availableMoves)
+            if (profile != null)
             {
-                if (move.type != lastPlayerMove.type)
+                if (profile.prefersAggression)
                 {
-                    currentAIMove = move;
-                    return move;
+                    // Counter aggression with control or reflection
+                    return FindMove(availableMoves, MoveType.Control)
+                        ?? FindMove(availableMoves, MoveType.Reflection)
+                        ?? GetRandomMove(availableMoves);
+                }
+                else if (profile.oftenBluffs)
+                {
+                    // Punish bluffing with direct force
+                    return FindMove(availableMoves, MoveType.Aggression)
+                        ?? GetRandomMove(availableMoves);
                 }
             }
 
-            currentAIMove = availableMoves[0];
-            return currentAIMove;
+            // Default: try tricking or confusing
+            return FindMove(availableMoves, MoveType.Bluff)
+                ?? GetRandomMove(availableMoves);
         }
+
+        // MID GAME: React to last known move
+        Move lastPlayerMove = playerMoveHistory[playerMoveHistory.Count - 1];
+
+        // Avoid repeating the same move type as the player
+        foreach (Move move in availableMoves)
+        {
+            if (move.type != lastPlayerMove.type)
+            {
+                currentAIMove = move;
+                return move;
+            }
+        }
+
+        // Fallback: Just return something
+        currentAIMove = availableMoves[0];
+        return currentAIMove;
     }
 
     public Move PredictFinalMove(Move[] availableMoves)
     {
-        if (profile != null && profile.oftenBluffs)
-            return FindMove(availableMoves, MoveType.Bluff);
+        if (availableMoves == null || availableMoves.Length == 0)
+        {
+            Debug.LogWarning("AIManager: No available moves for final prediction.");
+            return null;
+        }
 
+        // Use profile to infer possible final move
+        if (profile != null && profile.oftenBluffs)
+        {
+            return FindMove(availableMoves, MoveType.Bluff)
+                ?? GetRandomMove(availableMoves);
+        }
+
+        // Pattern recognition (simple repetition)
         if (playerMoveHistory.Count >= 2)
         {
             Move last = playerMoveHistory[playerMoveHistory.Count - 1];
@@ -66,7 +98,7 @@ public class AIManager : MonoBehaviour
                 return last;
         }
 
-        return availableMoves[Random.Range(0, availableMoves.Length)];
+        return GetRandomMove(availableMoves);
     }
 
     private Move FindMove(Move[] list, MoveType type)
@@ -77,6 +109,11 @@ public class AIManager : MonoBehaviour
                 return move;
         }
 
-        return list[0];
+        return null;
+    }
+
+    private Move GetRandomMove(Move[] list)
+    {
+        return list[Random.Range(0, list.Length)];
     }
 }
