@@ -12,17 +12,19 @@ public class GameManager : MonoBehaviour
     private int currentRound = 1;
     private int totalRounds = 5;
 
+    private TauntGenerator tauntGenerator;
+
     void Start()
     {
         Debug.Log("GameManager Start() running");
 
-        if (uiManager == null || playerManager == null || aiManager == null)
+        if (uiManager == null || playerManager == null || aiManager == null || memoryLog == null)
         {
             Debug.LogError("GameManager: Missing references in Inspector.");
             return;
         }
 
-        allMoves = MoveLoader.LoadMoves(); // uses static method now
+        allMoves = MoveLoader.LoadMoves();
 
         if (allMoves == null || allMoves.Length == 0)
         {
@@ -35,7 +37,9 @@ public class GameManager : MonoBehaviour
             prefersAggression = false,
             oftenBluffs = false
         };
+
         aiManager.Initialize(profile);
+        tauntGenerator = new TauntGenerator(profile, memoryLog); // Initialize taunt system
 
         uiManager.SetAvailableMoves(allMoves);
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
@@ -55,7 +59,8 @@ public class GameManager : MonoBehaviour
         Move aiMove = aiManager.DecideMove(allMoves);
         Debug.Log($"AI played: {aiMove.name}");
 
-        string taunt = $"You played {move.name}. I respond with {aiMove.name}.";
+        // Use dynamic taunt instead of static string
+        string taunt = tauntGenerator.GenerateTaunt(currentRound);
         uiManager.DisplayAITaunt(taunt);
 
         playerManager.AddMove(move);

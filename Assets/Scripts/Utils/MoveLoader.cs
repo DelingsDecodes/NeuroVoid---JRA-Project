@@ -1,26 +1,33 @@
-using UnityEngine;
 using System.IO;
+using UnityEngine;
 
 public static class MoveLoader
 {
     public static Move[] LoadMoves()
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "Moves.json");
+        string filePath = Path.Combine(Application.streamingAssetsPath, "Moves.json");
 
-        if (!File.Exists(path))
+        if (!File.Exists(filePath))
         {
-            Debug.LogError($"MoveLoader: File not found at path: {path}");
-            return new Move[0];
+            Debug.LogError($"MoveLoader: File not found at path: {filePath}");
+            return null;
         }
 
-        string json = File.ReadAllText(path);
-        Move[] moves = JsonHelper.FromJson<Move>(json);
+        string json = File.ReadAllText(filePath);
+        MoveList moveList = JsonUtility.FromJson<MoveList>("{\"moves\":" + json + "}");
 
-        if (moves == null || moves.Length == 0)
+        if (moveList == null || moveList.moves == null || moveList.moves.Length == 0)
         {
-            Debug.LogError("MoveLoader: Failed to parse or empty moves.");
+            Debug.LogError("MoveLoader: Failed to parse or no moves found.");
+            return null;
         }
 
-        return moves;
+        return moveList.moves;
+    }
+
+    [System.Serializable]
+    private class MoveList
+    {
+        public Move[] moves;
     }
 }
