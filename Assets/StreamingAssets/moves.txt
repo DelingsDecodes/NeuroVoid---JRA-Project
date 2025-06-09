@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Surge",
+    "description": "Overwhelming attack",
+    "type": 0
+  },
+  {
+    "name": "Disrupt",
+    "description": "Neutralize next move",
+    "type": 1
+  },
+  {
+    "name": "Loop",
+    "description": "Repeat last action",
+    "type": 2
+  },
+  {
+    "name": "Fracture",
+    "description": "Reflect back damage",
+    "type": 3
+  },
+  {
+    "name": "Null",
+    "description": "Do nothing (fake)",
+    "type": 4
+  }
+]

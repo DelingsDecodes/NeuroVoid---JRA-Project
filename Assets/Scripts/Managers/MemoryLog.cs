@@ -1,49 +1,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// Tracks every round of the game for memory analysis and UI display.
-
+// Logs round history for potential AI learning or UI display
 public class MemoryLog : MonoBehaviour
 {
-    [System.Serializable]
-    public class RoundEntry
+    public class RoundRecord
     {
         public int roundNumber;
-        public Move playerMove;
-        public Move aiMove;
-        public string result;  // e.g., "Player Win", "AI Win", "Draw", "Bluff Success"
+        public string playerMove;
+        public string aiMove;
+        public string outcome; // e.g., "Win", "Lose", "Draw" 
     }
 
-    public List<RoundEntry> roundHistory = new List<RoundEntry>();
+    private List<RoundRecord> history = new List<RoundRecord>();
 
-    public void LogRound(int round, Move playerMove, Move aiMove, string result)
+    public void LogRound(int round, Move playerMove, Move aiMove, string outcome = "")
     {
-        RoundEntry entry = new RoundEntry
+        RoundRecord record = new RoundRecord
         {
             roundNumber = round,
-            playerMove = playerMove,
-            aiMove = aiMove,
-            result = result
+            playerMove = playerMove.name,
+            aiMove = aiMove.name,
+            outcome = outcome
         };
 
-        roundHistory.Add(entry);
+        history.Add(record);
+        Debug.Log($"[MemoryLog] Round {round}: Player - {record.playerMove}, AI - {record.aiMove}, Outcome - {outcome}");
+    }
 
-        Debug.Log($"[MemoryLog] Round {round}: Player = {playerMove.name}, AI = {aiMove.name}, Result = {result}");
+    public List<RoundRecord> GetHistory()
+    {
+        return history;
     }
 
     public void ClearLog()
     {
-        roundHistory.Clear();
-    }
-
-    public RoundEntry GetLastRound()
-    {
-        if (roundHistory.Count == 0) return null;
-        return roundHistory[roundHistory.Count - 1];
-    }
-
-    public List<RoundEntry> GetFullLog()
-    {
-        return roundHistory;
+        history.Clear();
     }
 }
