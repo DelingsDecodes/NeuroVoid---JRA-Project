@@ -1,115 +1,92 @@
-using System.Collections;
-using UnityEngine;
-
-// Central game loop manager for Neurovoid Protocol.
-// Manages turns, win tracking, and the final showdown.
+ï»¿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public UIManager uiManager;
     public PlayerManager playerManager;
     public AIManager aiManager;
 
-    public Move[] allMoves;          // Loaded externally (e.g., from MoveLoader)
-    public int currentRound = 0;
-    public int maxRounds = 5;
+    public Move[] allMoves;  // Reference to available moves
 
-    public int playerWins = 0;
-    public int aiWins = 0;
-
-    public bool gameEnded = false;
+    private int currentRound = 1;
+    private int totalRounds = 5;
 
     void Start()
+{
+    Debug.Log("GameManager Start() running");
+
+    if (uiManager == null || playerManager == null || aiManager == null)
     {
-        currentRound = 0;
-        playerWins = 0;
-        aiWins = 0;
-        gameEnded = false;
+        Debug.LogError("GameManager: Missing references in Inspector.");
+        return;
     }
 
-    /// Called when the player selects a move via UI.
-
-    public void PlayerSelectedMove(Move selectedMove)
+    // Temporary mockup for demo/testing
+    if (allMoves == null || allMoves.Length == 0)
     {
-        if (gameEnded || currentRound >= maxRounds) return;
+        allMoves = new Move[5];
+        allMoves[0] = new Move { name = "Surge", type = MoveType.Attack };
+        allMoves[1] = new Move { name = "Disrupt", type = MoveType.Defense };
+        allMoves[2] = new Move { name = "Loop", type = MoveType.Repeat };
+        allMoves[3] = new Move { name = "Fracture", type = MoveType.Mirror };
+        allMoves[4] = new Move { name = "Null", type = MoveType.Bluff };
+    }
 
-        playerManager.SelectMove(selectedMove);
-        aiManager.ObservePlayerMove(selectedMove);
+    PlayerProfile profile = new PlayerProfile
+    {
+        prefersAggression = false,
+        oftenBluffs = false
+    };
+    aiManager.Initialize(profile);
 
+    uiManager.SetAvailableMoves(allMoves);
+    uiManager.UpdateRoundCounter(currentRound, totalRounds);
+}
+
+
+    public void PlayerSelectedMove(Move move)
+    {
+        if (move == null)
+        {
+            Debug.LogError("GameManager: PlayerSelectedMove received a null move.");
+            return;
+        }
+
+        Debug.Log($"Player selected: {move.name}");
+
+        // AI responds
+        aiManager.ObservePlayerMove(move);
         Move aiMove = aiManager.DecideMove(allMoves);
+        Debug.Log($"AI played: {aiMove.name}");
 
-        Debug.Log($"Round {currentRound + 1}: Player = {selectedMove.name}, AI = {aiMove.name}");
+        // Show taunt (simple placeholder)
+        string taunt = $"You played {move.name}. I respond with {aiMove.name}.";
+        uiManager.DisplayAITaunt(taunt);
 
-        ResolveRound(selectedMove, aiMove);
+        // Save move history
+        playerManager.AddMove(move);
+
+        // Advance round
         currentRound++;
-
-        if (currentRound >= maxRounds)
+        if (currentRound <= totalRounds)
         {
-            FinalShowdown();
-        }
-    }
-
- 
-    /// Compare moves to determine round winner (basic logic for now).
-    
-    private void ResolveRound(Move playerMove, Move aiMove)
-    {
-        if (playerMove.type == MoveType.Bluff && aiMove.type != MoveType.Bluff)
-        {
-            playerWins++;
-            Debug.Log("Player outsmarted AI with a bluff.");
-        }
-        else if (aiMove.type == MoveType.Bluff && playerMove.type != MoveType.Bluff)
-        {
-            aiWins++;
-            Debug.Log("AI bluffed and won.");
-        }
-        else if (playerMove.type != aiMove.type)
-        {
-            playerWins++;
-            Debug.Log("Player wins round by mismatch.");
+            uiManager.UpdateRoundCounter(currentRound, totalRounds);
         }
         else
         {
-            aiWins++;
-            Debug.Log("AI wins on tie logic.");
+            EndGame();
         }
-    }
-
-    /// Final round — AI predicts your move and anticipate it aswell
-
-    private void FinalShowdown()
-    {
-        Move predicted = aiManager.PredictFinalMove(allMoves);
-        Debug.Log("AI predicts you'll play: " + predicted.name);
-
-        Move actual = playerManager.GetLastMove();
-
-        if (actual != null && predicted.type == actual.type)
-        {
-            Debug.Log("AI correctly predicted your final move!");
-            aiWins++;
-        }
-        else
-        {
-            Debug.Log("You defied the AI's prediction.");
-            playerWins++;
-        }
-
-        gameEnded = true;
-        EndGame();
     }
 
     private void EndGame()
     {
-        Debug.Log($"Game Over. Player Wins: {playerWins}, AI Wins: {aiWins}");
+        Debug.Log("Game Over");
 
-        if (playerWins > aiWins)
-        {
-            Debug.Log("You broke the AI. You win.");
-        }
-        else
-        {
-            Debug.Log("The AI understood you too well. You’re trapped.");
-        }
+        // Final prediction
+        Move prediction = aiManager.PredictFinalMove(allMoves);
+        string result = $"Game over. My final prediction is: {prediction.name}";
+        uiManager.DisplayAITaunt(result);
+
+        // You can extend this to load a results screen or restart the game
     }
 }
