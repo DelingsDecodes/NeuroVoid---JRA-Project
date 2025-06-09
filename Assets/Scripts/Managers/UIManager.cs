@@ -2,22 +2,22 @@
 using UnityEngine.UI;
 using TMPro;
 
-// Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts, and summary.
+// Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts, and summary panel.
 public class UIManager : MonoBehaviour
 {
     public GameManager gameManager;
 
     [Header("Move Buttons")]
-    public Button[] moveButtons;                     // The clickable move buttons
-    public TextMeshProUGUI[] moveButtonLabels;       // Text labels inside each button
+    public Button[] moveButtons;
+    public TextMeshProUGUI[] moveButtonLabels;
 
     [Header("UI Text")]
-    public TextMeshProUGUI aiTauntText;              // Where the AI taunts appear
-    public TextMeshProUGUI roundCounterText;         // Round info display
+    public TextMeshProUGUI aiTauntText;
+    public TextMeshProUGUI roundCounterText;
 
-    [Header("Post-Game Summary UI")]
-    public GameObject summaryPanel;                  // Panel object that shows the final summary
-    public TextMeshProUGUI summaryText;              // Text display inside the summary panel
+    [Header("Summary Panel")]
+    public GameObject summaryPanel;
+    public TextMeshProUGUI summaryText;
 
     private Move[] availableMoves;
 
@@ -31,35 +31,23 @@ public class UIManager : MonoBehaviour
 
         if (moveButtons.Length != moves.Length || moveButtonLabels.Length != moves.Length)
         {
-            Debug.LogError($"UIManager: Array size mismatch. " +
-                $"Buttons = {moveButtons.Length}, Labels = {moveButtonLabels.Length}, Moves = {moves.Length}");
+            Debug.LogError("UIManager: Array size mismatch.");
             return;
         }
 
         availableMoves = moves;
-        Debug.Log($"SetAvailableMoves called with {moves.Length} moves");
 
         for (int i = 0; i < moves.Length; i++)
         {
             int index = i;
 
             if (moveButtonLabels[i] != null)
-            {
                 moveButtonLabels[i].text = moves[i].name;
-            }
-            else
-            {
-                Debug.LogWarning($"UIManager: Missing label for button {i}.");
-            }
 
             if (moveButtons[i] != null)
             {
-                moveButtons[i].onClick.RemoveAllListeners(); // Avoid stacking listeners
+                moveButtons[i].onClick.RemoveAllListeners();
                 moveButtons[i].onClick.AddListener(() => OnMoveButtonClicked(index));
-            }
-            else
-            {
-                Debug.LogWarning($"UIManager: Missing button at index {i}.");
             }
         }
     }
@@ -82,10 +70,6 @@ public class UIManager : MonoBehaviour
         {
             aiTauntText.text = message;
         }
-        else
-        {
-            Debug.LogWarning("UIManager: aiTauntText not assigned.");
-        }
     }
 
     public void UpdateRoundCounter(int round, int total)
@@ -94,23 +78,18 @@ public class UIManager : MonoBehaviour
         {
             roundCounterText.text = $"Round {round} / {total}";
         }
-        else
-        {
-            Debug.LogWarning("UIManager: roundCounterText not assigned.");
-        }
     }
 
-    // Called by PostGameSummary to show end-of-duel breakdown
-    public void DisplaySummary(string message)
+    public void DisplaySummary(string summary)
     {
-        if (summaryText != null && summaryPanel != null)
+        if (summaryPanel != null && summaryText != null)
         {
-            summaryText.text = message;
             summaryPanel.SetActive(true);
+            summaryText.text = summary;
         }
         else
         {
-            Debug.LogWarning("UIManager: summaryText or summaryPanel not assigned.");
+            Debug.LogWarning("UIManager: Summary UI not assigned.");
         }
     }
 }
