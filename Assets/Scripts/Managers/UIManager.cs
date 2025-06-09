@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 
-// Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts.
+// Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts, and summary.
 public class UIManager : MonoBehaviour
 {
     public GameManager gameManager;
@@ -15,6 +15,10 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI aiTauntText;              // Where the AI taunts appear
     public TextMeshProUGUI roundCounterText;         // Round info display
 
+    [Header("Post-Game Summary UI")]
+    public GameObject summaryPanel;                  // Panel object that shows the final summary
+    public TextMeshProUGUI summaryText;              // Text display inside the summary panel
+
     private Move[] availableMoves;
 
     public void SetAvailableMoves(Move[] moves)
@@ -25,8 +29,6 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        Debug.Log($"SetAvailableMoves called with {moves.Length} moves");
-
         if (moveButtons.Length != moves.Length || moveButtonLabels.Length != moves.Length)
         {
             Debug.LogError($"UIManager: Array size mismatch. " +
@@ -35,6 +37,7 @@ public class UIManager : MonoBehaviour
         }
 
         availableMoves = moves;
+        Debug.Log($"SetAvailableMoves called with {moves.Length} moves");
 
         for (int i = 0; i < moves.Length; i++)
         {
@@ -94,6 +97,20 @@ public class UIManager : MonoBehaviour
         else
         {
             Debug.LogWarning("UIManager: roundCounterText not assigned.");
+        }
+    }
+
+    // Called by PostGameSummary to show end-of-duel breakdown
+    public void DisplaySummary(string message)
+    {
+        if (summaryText != null && summaryPanel != null)
+        {
+            summaryText.text = message;
+            summaryPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: summaryText or summaryPanel not assigned.");
         }
     }
 }

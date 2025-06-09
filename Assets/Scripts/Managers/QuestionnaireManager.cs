@@ -2,9 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-
 // Displays a psychological questionnaire and builds the player's profile.
-
 public class QuestionnaireManager : MonoBehaviour
 {
     public GameObject questionnairePanel;
@@ -103,6 +101,21 @@ public class QuestionnaireManager : MonoBehaviour
     {
         questionnairePanel.SetActive(false);
         Debug.Log("Quiz complete. PlayerProfile seeded.");
-        FindObjectOfType<AIManager>().Initialize(profile);
+
+        AIManager ai = FindObjectOfType<AIManager>();
+        if (ai != null)
+        {
+            ai.Initialize(profile);
+            Debug.Log("AIManager initialized with player profile.");
+        }
+        else
+        {
+            Debug.LogWarning("No AIManager found in scene.");
+        }
+    }
+
+    public PlayerProfile GetProfile()
+    {
+        return profile;
     }
 }

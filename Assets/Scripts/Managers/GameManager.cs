@@ -6,40 +6,34 @@ public class GameManager : MonoBehaviour
     public PlayerManager playerManager;
     public AIManager aiManager;
     public MemoryLog memoryLog;
+    public QuestionnaireManager questionnaireManager; //  Assign this via Inspector
 
     public Move[] allMoves;
+    private TauntGenerator tauntGenerator;
 
     private int currentRound = 1;
     private int totalRounds = 5;
-
-    private TauntGenerator tauntGenerator;
 
     void Start()
     {
         Debug.Log("GameManager Start() running");
 
-        if (uiManager == null || playerManager == null || aiManager == null || memoryLog == null)
+        if (uiManager == null || playerManager == null || aiManager == null || memoryLog == null || questionnaireManager == null)
         {
             Debug.LogError("GameManager: Missing references in Inspector.");
             return;
         }
 
         allMoves = MoveLoader.LoadMoves();
-
         if (allMoves == null || allMoves.Length == 0)
         {
             Debug.LogError("GameManager: No moves loaded from JSON.");
             return;
         }
 
-        PlayerProfile profile = new PlayerProfile
-        {
-            prefersAggression = false,
-            oftenBluffs = false
-        };
-
+        PlayerProfile profile = questionnaireManager.GetProfile(); // Pull actual answers
         aiManager.Initialize(profile);
-        tauntGenerator = new TauntGenerator(profile, memoryLog); // Initialize taunt system
+        tauntGenerator = new TauntGenerator(profile, memoryLog);
 
         uiManager.SetAvailableMoves(allMoves);
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
@@ -59,7 +53,6 @@ public class GameManager : MonoBehaviour
         Move aiMove = aiManager.DecideMove(allMoves);
         Debug.Log($"AI played: {aiMove.name}");
 
-        // Use dynamic taunt instead of static string
         string taunt = tauntGenerator.GenerateTaunt(currentRound);
         uiManager.DisplayAITaunt(taunt);
 
@@ -80,7 +73,6 @@ public class GameManager : MonoBehaviour
     private void EndGame()
     {
         Debug.Log("Game Over");
-
         Move prediction = aiManager.PredictFinalMove(allMoves);
         string result = $"Game over. My final prediction is: {prediction.name}";
         uiManager.DisplayAITaunt(result);
