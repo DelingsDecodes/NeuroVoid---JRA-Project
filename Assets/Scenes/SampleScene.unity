@@ -331,6 +331,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 164419335}
   m_CullTransparentMesh: 1
+--- !u!1 &251473356
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 251473358}
+  - component: {fileID: 251473357}
+  m_Layer: 0
+  m_Name: 'QuestionnaireManager '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &251473357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 251473356}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7269e773c2170834e84f45fafefe2a59, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  questionnairePanel: {fileID: 0}
+  questionText: {fileID: 0}
+  optionAButton: {fileID: 0}
+  optionBButton: {fileID: 0}
+--- !u!4 &251473358
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 251473356}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 356.23758, y: 370.57977, z: -0.3382172}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &284764964
 GameObject:
   m_ObjectHideFlags: 0
@@ -1872,7 +1920,8 @@ MonoBehaviour:
   playerManager: {fileID: 1803221948}
   aiManager: {fileID: 963173608}
   memoryLog: {fileID: 13151426}
-  postGameSummary: {fileID: 849899683}
+  questionnaireManager: {fileID: 251473357}
+  postGameSummary: {fileID: 0}
   allMoves: []
 --- !u!4 &1698044521
 Transform:
@@ -2460,3 +2509,4 @@ SceneRoots:
   - {fileID: 13151427}
   - {fileID: 859510227}
   - {fileID: 849899684}
+  - {fileID: 251473358}

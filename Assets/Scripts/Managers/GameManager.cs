@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
     public AIManager aiManager;
     public MemoryLog memoryLog;
     public QuestionnaireManager questionnaireManager;
-    public PostGameSummary postGameSummary; // NEW: summary component
+    public PostGameSummary postGameSummary; //summary component
 
     public Move[] allMoves;
     private TauntGenerator tauntGenerator;
