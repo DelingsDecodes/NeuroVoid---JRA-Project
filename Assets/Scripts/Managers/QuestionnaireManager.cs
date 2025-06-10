@@ -1,25 +1,24 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System.Collections.Generic;
 
-// Displays a psychological questionnaire and builds the player's profile.
 public class QuestionnaireManager : MonoBehaviour
 {
-    public GameObject questionnairePanel;
-    public Text questionText;
-    public Button optionAButton;
-    public Button optionBButton;
+    [SerializeField] private GameObject questionnairePanel;
+    [SerializeField] private TextMeshProUGUI questionText;
+    [SerializeField] private Button optionAButton;
+    [SerializeField] private Button optionBButton;
 
     private int currentQuestionIndex = 0;
     private PlayerProfile profile;
-
     private List<QuestionData> questions;
 
     private class QuestionData
     {
         public string question;
-        public string optionA;  // Maps to true
-        public string optionB;  // Maps to false
+        public string optionA;
+        public string optionB;
         public System.Action<bool> applyAnswer;
 
         public QuestionData(string q, string a, string b, System.Action<bool> apply)
@@ -35,6 +34,13 @@ public class QuestionnaireManager : MonoBehaviour
     {
         profile = new PlayerProfile();
         SetupQuestions();
+
+        if (questionText == null || optionAButton == null || optionBButton == null)
+        {
+            Debug.LogError("QuestionnaireManager: One or more UI elements are not assigned!");
+            return;
+        }
+
         ShowQuestion(currentQuestionIndex);
     }
 
@@ -78,10 +84,10 @@ public class QuestionnaireManager : MonoBehaviour
         }
 
         var q = questions[index];
-        questionText.text = q.question;
 
-        optionAButton.GetComponentInChildren<Text>().text = q.optionA;
-        optionBButton.GetComponentInChildren<Text>().text = q.optionB;
+        questionText.text = q.question;
+        optionAButton.GetComponentInChildren<TextMeshProUGUI>().text = q.optionA;
+        optionBButton.GetComponentInChildren<TextMeshProUGUI>().text = q.optionB;
 
         optionAButton.onClick.RemoveAllListeners();
         optionBButton.onClick.RemoveAllListeners();
@@ -99,7 +105,9 @@ public class QuestionnaireManager : MonoBehaviour
 
     private void FinishQuiz()
     {
-        questionnairePanel.SetActive(false);
+        if (questionnairePanel != null)
+            questionnairePanel.SetActive(false);
+
         Debug.Log("Quiz complete. PlayerProfile seeded.");
 
         AIManager ai = FindObjectOfType<AIManager>();
