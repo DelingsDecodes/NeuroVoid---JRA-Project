@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
@@ -7,7 +8,7 @@ public class GameManager : MonoBehaviour
     public AIManager aiManager;
     public MemoryLog memoryLog;
     public QuestionnaireManager questionnaireManager;
-    public PostGameSummary postGameSummary; //summary component
+    public PostGameSummary postGameSummary;
 
     public Move[] allMoves;
     private TauntGenerator tauntGenerator;
@@ -80,7 +81,17 @@ public class GameManager : MonoBehaviour
         string result = $"Game over. My final prediction is: {prediction.name}";
         uiManager.DisplayAITaunt(result);
 
-        // Show post-game analysis
         postGameSummary.ShowSummary(allMoves, prediction);
+    }
+
+    public void SelectSurge() => PlayerSelectedMove(GetMoveByName("Surge"));
+    public void SelectDisrupt() => PlayerSelectedMove(GetMoveByName("Disrupt"));
+    public void SelectLoop() => PlayerSelectedMove(GetMoveByName("Loop"));
+    public void SelectFracture() => PlayerSelectedMove(GetMoveByName("Fracture"));
+    public void SelectNull() => PlayerSelectedMove(GetMoveByName("Null"));
+
+    private Move GetMoveByName(string name)
+    {
+        return allMoves.FirstOrDefault(m => m.name == name);
     }
 }
