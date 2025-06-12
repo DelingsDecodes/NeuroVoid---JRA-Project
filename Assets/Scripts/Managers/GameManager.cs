@@ -48,43 +48,47 @@ public class GameManager : MonoBehaviour
         UnlockAllCards();
     }
 
-    public void PlayerSelectedMove(Move move)
+   public void PlayerSelectedMove(Move move)
+{
+    if (move == null)
     {
-        if (move == null)
-        {
-            Debug.LogError("GameManager: PlayerSelectedMove received a null move.");
-            return;
-        }
-
-        Debug.Log($"Player selected: {move.name}");
-
-        aiManager.ObservePlayerMove(move);
-        Move aiMove = aiManager.DecideMove(allMoves);
-        Debug.Log($"AI played: {aiMove.name}");
-
-        // Show taunt in pixel bubble
-        string taunt = tauntGenerator.GenerateTaunt(currentRound);
-        uiManager.ShowAITaunt(taunt);  
-
-        // Log round
-        playerManager.AddMove(move);
-        memoryLog.LogRound(currentRound, move, aiMove);
-
-        // Outcome message
-        string outcome = GetRoundOutcome(move.name, aiMove.name);
-        roundResultDisplay.ShowResult(move.name, aiMove.name, outcome);
-
-        currentRound++;
-        if (currentRound <= totalRounds)
-        {
-            uiManager.UpdateRoundCounter(currentRound, totalRounds);
-            UnlockAllCards();
-        }
-        else
-        {
-            EndGame();
-        }
+        Debug.LogError("GameManager: PlayerSelectedMove received a null move.");
+        return;
     }
+
+    Debug.Log($"Player selected: {move.name}");
+
+    aiManager.ObservePlayerMove(move);
+    Move aiMove = aiManager.DecideMove(allMoves);
+    Debug.Log($"AI played: {aiMove.name}");
+
+    // Show taunt in pixel bubble
+    string taunt = tauntGenerator.GenerateTaunt(currentRound);
+    uiManager.ShowAITaunt(taunt);
+
+    // Log round
+    playerManager.AddMove(move);
+    memoryLog.LogRound(currentRound, move, aiMove);
+
+    // Log to UI round tracker
+    uiManager.AppendToRoundLog($"Round {currentRound}: You played {move.name}, AI played {aiMove.name}");
+
+    // Outcome message
+    string outcome = GetRoundOutcome(move.name, aiMove.name);
+    roundResultDisplay.ShowResult(move.name, aiMove.name, outcome);
+
+    currentRound++;
+    if (currentRound <= totalRounds)
+    {
+        uiManager.UpdateRoundCounter(currentRound, totalRounds);
+        UnlockAllCards();
+    }
+    else
+    {
+        EndGame();
+    }
+}
+
 
     private void EndGame()
     {

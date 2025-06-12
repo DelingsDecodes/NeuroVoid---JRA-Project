@@ -15,6 +15,7 @@ public class UIManager : MonoBehaviour
     [Header("UI Text")]
     public TextMeshProUGUI aiTauntText;
     public TextMeshProUGUI roundCounterText;
+    public TextMeshProUGUI roundLogText; 
 
     [Header("Summary Panel")]
     public GameObject summaryPanel;
@@ -23,6 +24,10 @@ public class UIManager : MonoBehaviour
     [Header("AI Speech Bubble")]
     public CanvasGroup aiSpeechGroup;
     public TextMeshProUGUI aiSpeechText;
+
+    [Header("Player Speech Bubble")]
+    public CanvasGroup playerSpeechGroup;
+    public TextMeshProUGUI playerSpeechText;
 
     private Move[] availableMoves;
 
@@ -69,14 +74,6 @@ public class UIManager : MonoBehaviour
         gameManager.PlayerSelectedMove(selectedMove);
     }
 
-    public void DisplayAITaunt(string taunt)
-    {
-        if (aiTauntText != null)
-            aiTauntText.text = taunt;
-        else
-            Debug.LogWarning("UIManager: aiTauntText not assigned.");
-    }
-
     public void ShowAITaunt(string taunt)
     {
         if (aiSpeechText == null || aiSpeechGroup == null)
@@ -85,7 +82,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        StopAllCoroutines();
+        StopAllCoroutines(); // prevent overlapping coroutines
         aiSpeechText.text = "";
         aiSpeechGroup.alpha = 0;
         aiSpeechGroup.gameObject.SetActive(true);
@@ -102,6 +99,25 @@ public class UIManager : MonoBehaviour
             });
     }
 
+    public void ShowPlayerSpeech(string text)
+    {
+        if (playerSpeechGroup == null || playerSpeechText == null) return;
+
+        playerSpeechText.text = "";
+        playerSpeechGroup.alpha = 0;
+        playerSpeechGroup.gameObject.SetActive(true);
+
+        StartCoroutine(Typewriter(playerSpeechText, text, 0.03f));
+        LeanTween.alphaCanvas(playerSpeechGroup, 1f, 0.4f).setEaseOutQuad()
+            .setOnComplete(() =>
+            {
+                LeanTween.delayedCall(playerSpeechGroup.gameObject, 4.5f, () =>
+                {
+                    LeanTween.alphaCanvas(playerSpeechGroup, 0f, 0.4f).setEaseInQuad();
+                });
+            });
+    }
+
     private IEnumerator TypeText(string message)
     {
         aiSpeechText.text = "";
@@ -110,6 +126,24 @@ public class UIManager : MonoBehaviour
             aiSpeechText.text += letter;
             yield return new WaitForSeconds(0.02f);
         }
+    }
+
+    private IEnumerator Typewriter(TextMeshProUGUI textComponent, string message, float delay)
+    {
+        textComponent.text = "";
+        foreach (char c in message.ToCharArray())
+        {
+            textComponent.text += c;
+            yield return new WaitForSeconds(delay);
+        }
+    }
+
+    public void DisplayAITaunt(string taunt)
+    {
+        if (aiTauntText != null)
+            aiTauntText.text = taunt;
+        else
+            Debug.LogWarning("UIManager: aiTauntText not assigned.");
     }
 
     public void UpdateRoundCounter(int round, int total)
@@ -130,6 +164,15 @@ public class UIManager : MonoBehaviour
         else
         {
             Debug.LogWarning("UIManager: Summary UI not assigned.");
+        }
+    }
+
+
+    public void AppendToRoundLog(string roundInfo)
+    {
+        if (roundLogText != null)
+        {
+            roundLogText.text += roundInfo + "\n";
         }
     }
 }
