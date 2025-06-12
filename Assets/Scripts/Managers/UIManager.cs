@@ -15,7 +15,8 @@ public class UIManager : MonoBehaviour
     [Header("UI Text")]
     public TextMeshProUGUI aiTauntText;
     public TextMeshProUGUI roundCounterText;
-    public TextMeshProUGUI roundLogText; 
+    public TextMeshProUGUI roundLogText;
+    public ScrollRect roundLogScrollRect; 
 
     [Header("Summary Panel")]
     public GameObject summaryPanel;
@@ -82,7 +83,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        StopAllCoroutines(); // prevent overlapping coroutines
+        StopAllCoroutines();
         aiSpeechText.text = "";
         aiSpeechGroup.alpha = 0;
         aiSpeechGroup.gameObject.SetActive(true);
@@ -167,12 +168,21 @@ public class UIManager : MonoBehaviour
         }
     }
 
-
     public void AppendToRoundLog(string roundInfo)
     {
         if (roundLogText != null)
         {
             roundLogText.text += roundInfo + "\n";
+            StartCoroutine(ScrollToBottomNextFrame()); //Auto-scroll
+        }
+    }
+
+    private IEnumerator ScrollToBottomNextFrame()
+    {
+        yield return null; // wait 1 frame
+        if (roundLogScrollRect != null)
+        {
+            roundLogScrollRect.verticalNormalizedPosition = 0f;
         }
     }
 }
