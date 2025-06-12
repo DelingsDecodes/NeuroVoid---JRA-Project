@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager Start() running");
 
+        // Check if required references are assigned
         if (uiManager == null || playerManager == null || aiManager == null ||
             memoryLog == null || questionnaireManager == null || postGameSummary == null)
         {
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // Load moves from JSON
         allMoves = MoveLoader.LoadMoves();
         if (allMoves == null || allMoves.Length == 0)
         {
@@ -34,12 +36,16 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        PlayerProfile profile = questionnaireManager.GetProfile(); // Get profile from quiz
+        // Get player profile from questionnaire
+        PlayerProfile profile = questionnaireManager.GetProfile();
         aiManager.Initialize(profile);
         tauntGenerator = new TauntGenerator(profile, memoryLog);
 
+        // Initialize UI
         uiManager.SetAvailableMoves(allMoves);
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
+
+        UnlockAllCards();
     }
 
     public void PlayerSelectedMove(Move move)
@@ -56,16 +62,20 @@ public class GameManager : MonoBehaviour
         Move aiMove = aiManager.DecideMove(allMoves);
         Debug.Log($"AI played: {aiMove.name}");
 
+        // Generate taunt for this round
         string taunt = tauntGenerator.GenerateTaunt(currentRound);
         uiManager.DisplayAITaunt(taunt);
 
+        // Store move history
         playerManager.AddMove(move);
         memoryLog.LogRound(currentRound, move, aiMove);
 
         currentRound++;
+
         if (currentRound <= totalRounds)
         {
             uiManager.UpdateRoundCounter(currentRound, totalRounds);
+            UnlockAllCards();
         }
         else
         {
@@ -84,6 +94,7 @@ public class GameManager : MonoBehaviour
         postGameSummary.ShowSummary(allMoves, prediction);
     }
 
+    // Direct access for buttons
     public void SelectSurge() => PlayerSelectedMove(GetMoveByName("Surge"));
     public void SelectDisrupt() => PlayerSelectedMove(GetMoveByName("Disrupt"));
     public void SelectLoop() => PlayerSelectedMove(GetMoveByName("Loop"));
@@ -92,6 +103,18 @@ public class GameManager : MonoBehaviour
 
     private Move GetMoveByName(string name)
     {
-        return allMoves.FirstOrDefault(m => m.name == name);
+        var move = allMoves.FirstOrDefault(m => m.name == name);
+        if (move == null) Debug.LogWarning($"Move '{name}' not found in Move list.");
+        return move;
+    }
+
+    private void UnlockAllCards()
+    {
+        // Unlock cards 
+        CardAnimator[] cards = FindObjectsOfType<CardAnimator>();
+        foreach (var card in cards)
+        {
+            card.UnlockCard();
+        }
     }
 }
