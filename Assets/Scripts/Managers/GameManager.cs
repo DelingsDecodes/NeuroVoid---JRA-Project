@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public MemoryLog memoryLog;
     public QuestionnaireManager questionnaireManager;
     public PostGameSummary postGameSummary;
+    public RoundResultDisplay roundResultDisplay; 
 
     public Move[] allMoves;
     private TauntGenerator tauntGenerator;
@@ -20,15 +21,15 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager Start() running");
 
-        // Check if required references are assigned
+        // Check all references
         if (uiManager == null || playerManager == null || aiManager == null ||
-            memoryLog == null || questionnaireManager == null || postGameSummary == null)
+            memoryLog == null || questionnaireManager == null || postGameSummary == null || roundResultDisplay == null)
         {
             Debug.LogError("GameManager: Missing references in Inspector.");
             return;
         }
 
-        // Load moves from JSON
+        // Load moves
         allMoves = MoveLoader.LoadMoves();
         if (allMoves == null || allMoves.Length == 0)
         {
@@ -36,52 +37,58 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Get player profile from questionnaire
+        // Setup AI and taunts
         PlayerProfile profile = questionnaireManager.GetProfile();
         aiManager.Initialize(profile);
         tauntGenerator = new TauntGenerator(profile, memoryLog);
 
-        // Initialize UI
+        // UI setup
         uiManager.SetAvailableMoves(allMoves);
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
-
         UnlockAllCards();
     }
 
-    public void PlayerSelectedMove(Move move)
+   public void PlayerSelectedMove(Move move)
+{
+    if (move == null)
     {
-        if (move == null)
-        {
-            Debug.LogError("GameManager: PlayerSelectedMove received a null move.");
-            return;
-        }
-
-        Debug.Log($"Player selected: {move.name}");
-
-        aiManager.ObservePlayerMove(move);
-        Move aiMove = aiManager.DecideMove(allMoves);
-        Debug.Log($"AI played: {aiMove.name}");
-
-        // Generate taunt for this round
-        string taunt = tauntGenerator.GenerateTaunt(currentRound);
-        uiManager.DisplayAITaunt(taunt);
-
-        // Store move history
-        playerManager.AddMove(move);
-        memoryLog.LogRound(currentRound, move, aiMove);
-
-        currentRound++;
-
-        if (currentRound <= totalRounds)
-        {
-            uiManager.UpdateRoundCounter(currentRound, totalRounds);
-            UnlockAllCards();
-        }
-        else
-        {
-            EndGame();
-        }
+        Debug.LogError("GameManager: PlayerSelectedMove received a null move.");
+        return;
     }
+
+    Debug.Log($"Player selected: {move.name}");
+
+    aiManager.ObservePlayerMove(move);
+    Move aiMove = aiManager.DecideMove(allMoves);
+    Debug.Log($"AI played: {aiMove.name}");
+
+    // Show taunt in pixel bubble
+    string taunt = tauntGenerator.GenerateTaunt(currentRound);
+    uiManager.ShowAITaunt(taunt);
+
+    // Log round
+    playerManager.AddMove(move);
+    memoryLog.LogRound(currentRound, move, aiMove);
+
+    // Log to UI round tracker
+    uiManager.AppendToRoundLog($"Round {currentRound}: You played {move.name}, AI played {aiMove.name}");
+
+    // Outcome message
+    string outcome = GetRoundOutcome(move.name, aiMove.name);
+    roundResultDisplay.ShowResult(move.name, aiMove.name, outcome);
+
+    currentRound++;
+    if (currentRound <= totalRounds)
+    {
+        uiManager.UpdateRoundCounter(currentRound, totalRounds);
+        UnlockAllCards();
+    }
+    else
+    {
+        EndGame();
+    }
+}
+
 
     private void EndGame()
     {
@@ -89,12 +96,12 @@ public class GameManager : MonoBehaviour
 
         Move prediction = aiManager.PredictFinalMove(allMoves);
         string result = $"Game over. My final prediction is: {prediction.name}";
-        uiManager.DisplayAITaunt(result);
+        uiManager.ShowAITaunt(result); //Replaced with bubble fade-in
 
         postGameSummary.ShowSummary(allMoves, prediction);
     }
 
-    // Direct access for buttons
+    // Shortcut methods for buttons
     public void SelectSurge() => PlayerSelectedMove(GetMoveByName("Surge"));
     public void SelectDisrupt() => PlayerSelectedMove(GetMoveByName("Disrupt"));
     public void SelectLoop() => PlayerSelectedMove(GetMoveByName("Loop"));
@@ -110,11 +117,23 @@ public class GameManager : MonoBehaviour
 
     private void UnlockAllCards()
     {
-        // Unlock cards 
         CardAnimator[] cards = FindObjectsOfType<CardAnimator>();
         foreach (var card in cards)
         {
             card.UnlockCard();
         }
+    }
+
+    // Determine round outcome description
+    private string GetRoundOutcome(string player, string ai)
+    {
+        if (player == ai)
+            return " A perfect clash!";
+        else if (player == "Surge" && ai == "Null") return " You overwhelmed their defense!";
+        else if (player == "Disrupt" && ai == "Surge") return " You intercepted them!";
+        else if (player == "Loop" && ai == "Disrupt") return " You broke their pattern!";
+        else if (player == "Fracture" && ai == "Loop") return " You shattered their cycle!";
+        else if (player == "Null" && ai == "Fracture") return " You absorbed the blow!";
+        else return " They slipped past your move...";
     }
 }

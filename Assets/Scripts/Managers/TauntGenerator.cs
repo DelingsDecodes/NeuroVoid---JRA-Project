@@ -49,12 +49,12 @@ public class TauntGenerator
     private string GetRandomDefaultTaunt()
     {
         string[] genericTaunts = {
-            "You think I can't see through you?",
+            "You think I can't see through you? MWahah",
             "Interesting move. Predictable, though.",
             "This duel is more transparent than you think.",
             "You repeat patterns even when I give you chances.",
             "You're playing checkers while I'm playing psychology.",
-            "Your mind is an open book—and I’ve already read the ending."
+            "Your mind is an open book and I’ve already read the ending."
         };
 
         return genericTaunts[Random.Range(0, genericTaunts.Length)];
