@@ -70,12 +70,15 @@ public class GameManager : MonoBehaviour
     playerManager.AddMove(move);
     memoryLog.LogRound(currentRound, move, aiMove);
 
-    // Log to UI round tracker
-    uiManager.AppendToRoundLog($"Round {currentRound}: You played {move.name}, AI played {aiMove.name}");
+    // Round outcome
+    string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
+    string outcomeType = GetOutcomeType(move.name, aiMove.name);
 
-    // Outcome message
-    string outcome = GetRoundOutcome(move.name, aiMove.name);
-    roundResultDisplay.ShowResult(move.name, aiMove.name, outcome);
+    // Log to round log with color
+    uiManager.AppendToRoundLog($"Round {currentRound}: You played {move.name}, AI played {aiMove.name}", outcomeType);
+
+    // Show outcome
+    roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
 
     currentRound++;
     if (currentRound <= totalRounds)
@@ -88,6 +91,7 @@ public class GameManager : MonoBehaviour
         EndGame();
     }
 }
+
 
 
     private void EndGame()
@@ -136,4 +140,19 @@ public class GameManager : MonoBehaviour
         else if (player == "Null" && ai == "Fracture") return " You absorbed the blow!";
         else return " They slipped past your move...";
     }
+
+
+
+    private string GetOutcomeType(string player, string ai)
+{
+    if (player == ai)
+        return "tie";
+    else if (player == "Surge" && ai == "Null") return "win";
+    else if (player == "Disrupt" && ai == "Surge") return "win";
+    else if (player == "Loop" && ai == "Disrupt") return "win";
+    else if (player == "Fracture" && ai == "Loop") return "win";
+    else if (player == "Null" && ai == "Fracture") return "win";
+    else return "loss";
+}
+
 }

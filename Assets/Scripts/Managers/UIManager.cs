@@ -168,21 +168,37 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void AppendToRoundLog(string roundInfo)
+    public void AppendToRoundLog(string roundInfo, string outcome)
+{
+    if (roundLogText != null)
     {
-        if (roundLogText != null)
+        string colorTag;
+
+        switch (outcome)
         {
-            roundLogText.text += roundInfo + "\n";
-            StartCoroutine(ScrollToBottomNextFrame()); //Auto-scroll
+            case "win":
+                colorTag = "<color=green>";
+                break;
+            case "loss":
+                colorTag = "<color=red>";
+                break;
+            case "tie":
+            default:
+                colorTag = "<color=gray>";
+                break;
         }
+
+        roundLogText.text += $"{colorTag}{roundInfo}</color>\n";
+        StartCoroutine(ScrollToBottomNextFrame());
     }
+}
 
     private IEnumerator ScrollToBottomNextFrame()
+{
+    yield return null;
+    if (roundLogScrollRect != null)
     {
-        yield return null; // wait 1 frame
-        if (roundLogScrollRect != null)
-        {
-            roundLogScrollRect.verticalNormalizedPosition = 0f;
-        }
+        roundLogScrollRect.verticalNormalizedPosition = 0f;
     }
+}
 }
