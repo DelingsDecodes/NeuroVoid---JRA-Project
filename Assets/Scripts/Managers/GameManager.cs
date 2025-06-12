@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     public MemoryLog memoryLog;
     public QuestionnaireManager questionnaireManager;
     public PostGameSummary postGameSummary;
-    public RoundResultDisplay roundResultDisplay; // NEW: hook this in Inspector
+    public RoundResultDisplay roundResultDisplay; 
 
     public Move[] allMoves;
     private TauntGenerator tauntGenerator;
@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager Start() running");
 
+        // Check all references
         if (uiManager == null || playerManager == null || aiManager == null ||
             memoryLog == null || questionnaireManager == null || postGameSummary == null || roundResultDisplay == null)
         {
@@ -28,6 +29,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // Load moves
         allMoves = MoveLoader.LoadMoves();
         if (allMoves == null || allMoves.Length == 0)
         {
@@ -35,10 +37,12 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // Setup AI and taunts
         PlayerProfile profile = questionnaireManager.GetProfile();
         aiManager.Initialize(profile);
         tauntGenerator = new TauntGenerator(profile, memoryLog);
 
+        // UI setup
         uiManager.SetAvailableMoves(allMoves);
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
         UnlockAllCards();
@@ -58,15 +62,15 @@ public class GameManager : MonoBehaviour
         Move aiMove = aiManager.DecideMove(allMoves);
         Debug.Log($"AI played: {aiMove.name}");
 
-        // Show taunt
+        // Show taunt in pixel bubble
         string taunt = tauntGenerator.GenerateTaunt(currentRound);
-        uiManager.DisplayAITaunt(taunt);
+        uiManager.ShowAITaunt(taunt);  
 
-        // Log the moves
+        // Log round
         playerManager.AddMove(move);
         memoryLog.LogRound(currentRound, move, aiMove);
 
-        // Show round result visually
+        // Outcome message
         string outcome = GetRoundOutcome(move.name, aiMove.name);
         roundResultDisplay.ShowResult(move.name, aiMove.name, outcome);
 
@@ -88,11 +92,12 @@ public class GameManager : MonoBehaviour
 
         Move prediction = aiManager.PredictFinalMove(allMoves);
         string result = $"Game over. My final prediction is: {prediction.name}";
-        uiManager.DisplayAITaunt(result);
+        uiManager.ShowAITaunt(result); // 🔄 Replaced with bubble fade-in
 
         postGameSummary.ShowSummary(allMoves, prediction);
     }
 
+    // Shortcut methods for buttons
     public void SelectSurge() => PlayerSelectedMove(GetMoveByName("Surge"));
     public void SelectDisrupt() => PlayerSelectedMove(GetMoveByName("Disrupt"));
     public void SelectLoop() => PlayerSelectedMove(GetMoveByName("Loop"));
@@ -115,7 +120,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Simple matchup logic (customize this to your design)
+    // Determine round outcome description
     private string GetRoundOutcome(string player, string ai)
     {
         if (player == ai)

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 // Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts, and summary panel.
 public class UIManager : MonoBehaviour
@@ -18,6 +19,10 @@ public class UIManager : MonoBehaviour
     [Header("Summary Panel")]
     public GameObject summaryPanel;
     public TextMeshProUGUI summaryText;
+
+    [Header("AI Speech Bubble")]
+    public CanvasGroup aiSpeechGroup;
+    public TextMeshProUGUI aiSpeechText;
 
     private Move[] availableMoves;
 
@@ -70,6 +75,41 @@ public class UIManager : MonoBehaviour
             aiTauntText.text = taunt;
         else
             Debug.LogWarning("UIManager: aiTauntText not assigned.");
+    }
+
+    public void ShowAITaunt(string taunt)
+    {
+        if (aiSpeechText == null || aiSpeechGroup == null)
+        {
+            Debug.LogWarning("UIManager: aiSpeechText or aiSpeechGroup not assigned.");
+            return;
+        }
+
+        StopAllCoroutines();
+        aiSpeechText.text = "";
+        aiSpeechGroup.alpha = 0;
+        aiSpeechGroup.gameObject.SetActive(true);
+
+        LeanTween.cancel(aiSpeechGroup.gameObject);
+        LeanTween.alphaCanvas(aiSpeechGroup, 1f, 0.4f).setEaseOutQuad()
+            .setOnComplete(() =>
+            {
+                StartCoroutine(TypeText(taunt));
+                LeanTween.delayedCall(aiSpeechGroup.gameObject, 4.5f, () =>
+                {
+                    LeanTween.alphaCanvas(aiSpeechGroup, 0f, 0.4f).setEaseInQuad();
+                });
+            });
+    }
+
+    private IEnumerator TypeText(string message)
+    {
+        aiSpeechText.text = "";
+        foreach (char letter in message.ToCharArray())
+        {
+            aiSpeechText.text += letter;
+            yield return new WaitForSeconds(0.02f);
+        }
     }
 
     public void UpdateRoundCounter(int round, int total)
