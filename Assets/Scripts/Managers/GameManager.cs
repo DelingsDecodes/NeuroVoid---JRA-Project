@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
 
         Move prediction = aiManager.PredictFinalMove(allMoves);
         string result = $"Game over. My final prediction is: {prediction.name}";
-        uiManager.ShowAITaunt(result); // 🔄 Replaced with bubble fade-in
+        uiManager.ShowAITaunt(result); //Replaced with bubble fade-in
 
         postGameSummary.ShowSummary(allMoves, prediction);
     }
