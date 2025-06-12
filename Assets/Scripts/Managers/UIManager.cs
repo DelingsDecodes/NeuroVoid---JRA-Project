@@ -64,12 +64,12 @@ public class UIManager : MonoBehaviour
         gameManager.PlayerSelectedMove(selectedMove);
     }
 
-    public void DisplayAITaunt(string message)
+    public void DisplayAITaunt(string taunt)
     {
         if (aiTauntText != null)
-        {
-            aiTauntText.text = message;
-        }
+            aiTauntText.text = taunt;
+        else
+            Debug.LogWarning("UIManager: aiTauntText not assigned.");
     }
 
     public void UpdateRoundCounter(int round, int total)
