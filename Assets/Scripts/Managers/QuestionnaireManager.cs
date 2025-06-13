@@ -43,9 +43,9 @@ public class QuestionnaireManager : MonoBehaviour
 
         ShowQuestion(currentQuestionIndex);
     }
-
+    // more general 
     private void SetupQuestions()
-    {
+    { // expanding on the questions 
         questions = new List<QuestionData>
         {
             new QuestionData(
@@ -53,15 +53,19 @@ public class QuestionnaireManager : MonoBehaviour
                 "Strike first", "Wait it out",
                 answer => profile.prefersAggression = answer),
 
+                // have a depend options which follows a different more precise question (senario)
+                // a third alternative option depeends will show the user is inde
             new QuestionData(
                 "Do you prefer to plan every step, or feel it out as you go?",
                 "Plan it all", "Go with the flow",
                 answer => profile.prefersControl = answer),
 
             new QuestionData(
+                // explain it even furthur (use poker as a example)
                 "When you lose, do you adapt… or get even?",
                 "Get even", "Adapt wisely",
                 answer => profile.seeksRevenge = answer),
+
 
             new QuestionData(
                 "How often do you bluff when playing games?",
