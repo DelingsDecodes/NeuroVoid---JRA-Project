@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class QuestionnaireManager : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class QuestionnaireManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI aggressionText;
     [SerializeField] private TextMeshProUGUI unpredictabilityText;
     [SerializeField] private float typingSpeed = 0.03f;
+    [SerializeField] private Button continueButton; 
 
     private int currentQuestionIndex = 0;
     private PlayerProfile profile;
@@ -134,30 +136,47 @@ public class QuestionnaireManager : MonoBehaviour
     }
 
     private void FinishQuiz()
+{
+    if (questionnairePanel != null)
+        questionnairePanel.SetActive(false); 
+
+    Debug.Log("Quiz complete. PlayerProfile seeded.");
+
+    AIManager ai = FindObjectOfType<AIManager>();
+    if (ai != null)
     {
-        if (questionnairePanel != null)
-            questionnairePanel.SetActive(false);
+        ai.Initialize(profile);
+        Debug.Log("AIManager initialized with player profile.");
+    }
+    else
+    {
+        Debug.LogWarning("No AIManager found in scene.");
+    }
 
-        Debug.Log("Quiz complete. PlayerProfile seeded.");
+    StartCoroutine(ShowSummaryAndLoadScene());
+}
 
+
+    private IEnumerator ShowSummaryAndLoadScene()
+    {
         if (summaryPanel != null)
         {
             summaryPanel.SetActive(true);
             impulsivenessText.text = $"Impulsiveness: {(profile.prefersControl ? 0.2f : 0.8f):F1}";
             aggressionText.text = $"Aggression: {(profile.prefersAggression ? 0.9f : 0.3f):F1}";
             unpredictabilityText.text = $"Unpredictability: {(profile.oftenBluffs ? 0.7f : 0.4f):F1}";
+
+            if (continueButton != null)
+                continueButton.gameObject.SetActive(false); 
         }
 
-        AIManager ai = FindObjectOfType<AIManager>();
-        if (ai != null)
-        {
-            ai.Initialize(profile);
-            Debug.Log("AIManager initialized with player profile.");
-        }
-        else
-        {
-            Debug.LogWarning("No AIManager found in scene.");
-        }
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene("MainScene");
+    }
+
+    public void ContinueToGame()
+    {
+        SceneManager.LoadScene("MainScene");
     }
 
     public PlayerProfile GetProfile()

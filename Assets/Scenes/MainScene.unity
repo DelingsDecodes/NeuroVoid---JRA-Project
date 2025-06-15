@@ -452,6 +452,12 @@ MonoBehaviour:
   questionText: {fileID: 763191675}
   optionAButton: {fileID: 1662193828}
   optionBButton: {fileID: 405570919}
+  progressBar: {fileID: 0}
+  summaryPanel: {fileID: 0}
+  impulsivenessText: {fileID: 0}
+  aggressionText: {fileID: 0}
+  unpredictabilityText: {fileID: 0}
+  typingSpeed: 0.03
 --- !u!4 &251473358
 Transform:
   m_ObjectHideFlags: 0
@@ -3684,8 +3690,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 18.8802, y: 4.6009}
-  m_SizeDelta: {x: 787.7648, y: 800.5779}
+  m_AnchoredPosition: {x: 12.228, y: 0.0000090599}
+  m_SizeDelta: {x: 794.4567, y: 800.5779}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1486312051
 MonoBehaviour:
