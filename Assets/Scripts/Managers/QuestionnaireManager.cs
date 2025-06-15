@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 using System.Collections.Generic;
 
 public class QuestionnaireManager : MonoBehaviour
@@ -9,10 +10,17 @@ public class QuestionnaireManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI questionText;
     [SerializeField] private Button optionAButton;
     [SerializeField] private Button optionBButton;
+    [SerializeField] private Slider progressBar;
+    [SerializeField] private GameObject summaryPanel;
+    [SerializeField] private TextMeshProUGUI impulsivenessText;
+    [SerializeField] private TextMeshProUGUI aggressionText;
+    [SerializeField] private TextMeshProUGUI unpredictabilityText;
+    [SerializeField] private float typingSpeed = 0.03f;
 
     private int currentQuestionIndex = 0;
     private PlayerProfile profile;
     private List<QuestionData> questions;
+    private Coroutine typingCoroutine;
 
     private class QuestionData
     {
@@ -41,11 +49,17 @@ public class QuestionnaireManager : MonoBehaviour
             return;
         }
 
+        if (progressBar != null)
+        {
+            progressBar.maxValue = questions.Count;
+            progressBar.value = 0;
+        }
+
         ShowQuestion(currentQuestionIndex);
     }
-    // more general 
+
     private void SetupQuestions()
-    { // expanding on the questions 
+    {
         questions = new List<QuestionData>
         {
             new QuestionData(
@@ -53,19 +67,15 @@ public class QuestionnaireManager : MonoBehaviour
                 "Strike first", "Wait it out",
                 answer => profile.prefersAggression = answer),
 
-                // have a depend options which follows a different more precise question (senario)
-                // a third alternative option depeends will show the user is inde
             new QuestionData(
                 "Do you prefer to plan every step, or feel it out as you go?",
                 "Plan it all", "Go with the flow",
                 answer => profile.prefersControl = answer),
 
             new QuestionData(
-                // explain it even furthur (use poker as a example)
                 "When you lose, do you adapt… or get even?",
                 "Get even", "Adapt wisely",
                 answer => profile.seeksRevenge = answer),
-
 
             new QuestionData(
                 "How often do you bluff when playing games?",
@@ -89,7 +99,10 @@ public class QuestionnaireManager : MonoBehaviour
 
         var q = questions[index];
 
-        questionText.text = q.question;
+        if (typingCoroutine != null)
+            StopCoroutine(typingCoroutine);
+        typingCoroutine = StartCoroutine(TypeText(q.question));
+
         optionAButton.GetComponentInChildren<TextMeshProUGUI>().text = q.optionA;
         optionBButton.GetComponentInChildren<TextMeshProUGUI>().text = q.optionB;
 
@@ -98,6 +111,19 @@ public class QuestionnaireManager : MonoBehaviour
 
         optionAButton.onClick.AddListener(() => OnAnswer(true));
         optionBButton.onClick.AddListener(() => OnAnswer(false));
+
+        if (progressBar != null)
+            progressBar.value = index + 1;
+    }
+
+    private IEnumerator TypeText(string fullText)
+    {
+        questionText.text = "";
+        foreach (char c in fullText)
+        {
+            questionText.text += c;
+            yield return new WaitForSeconds(typingSpeed);
+        }
     }
 
     private void OnAnswer(bool pickedA)
@@ -113,6 +139,14 @@ public class QuestionnaireManager : MonoBehaviour
             questionnairePanel.SetActive(false);
 
         Debug.Log("Quiz complete. PlayerProfile seeded.");
+
+        if (summaryPanel != null)
+        {
+            summaryPanel.SetActive(true);
+            impulsivenessText.text = $"Impulsiveness: {(profile.prefersControl ? 0.2f : 0.8f):F1}";
+            aggressionText.text = $"Aggression: {(profile.prefersAggression ? 0.9f : 0.3f):F1}";
+            unpredictabilityText.text = $"Unpredictability: {(profile.oftenBluffs ? 0.7f : 0.4f):F1}";
+        }
 
         AIManager ai = FindObjectOfType<AIManager>();
         if (ai != null)
