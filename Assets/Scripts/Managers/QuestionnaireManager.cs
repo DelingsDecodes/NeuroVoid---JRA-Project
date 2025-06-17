@@ -17,7 +17,8 @@ public class QuestionnaireManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI aggressionText;
     [SerializeField] private TextMeshProUGUI unpredictabilityText;
     [SerializeField] private float typingSpeed = 0.03f;
-    [SerializeField] private Button continueButton; 
+    [SerializeField] private Button continueButton;
+    [SerializeField] private CanvasGroup fadeCanvas;
 
     private int currentQuestionIndex = 0;
     private PlayerProfile profile;
@@ -42,6 +43,14 @@ public class QuestionnaireManager : MonoBehaviour
 
     void Start()
     {
+        if (fadeCanvas != null)
+        {
+            fadeCanvas.alpha = 0f;
+            fadeCanvas.blocksRaycasts = false;
+            fadeCanvas.interactable = false;
+            fadeCanvas.transform.SetAsLastSibling(); // Ensure on top
+        }
+
         profile = new PlayerProfile();
         SetupQuestions();
 
@@ -64,30 +73,16 @@ public class QuestionnaireManager : MonoBehaviour
     {
         questions = new List<QuestionData>
         {
-            new QuestionData(
-                "You're caught in a trap. Do you strike first or wait for a chance?",
-                "Strike first", "Wait it out",
-                answer => profile.prefersAggression = answer),
-
-            new QuestionData(
-                "Do you prefer to plan every step, or feel it out as you go?",
-                "Plan it all", "Go with the flow",
-                answer => profile.prefersControl = answer),
-
-            new QuestionData(
-                "When you lose, do you adapt… or get even?",
-                "Get even", "Adapt wisely",
-                answer => profile.seeksRevenge = answer),
-
-            new QuestionData(
-                "How often do you bluff when playing games?",
-                "I bluff a lot", "Rarely bluff",
-                answer => profile.oftenBluffs = answer),
-
-            new QuestionData(
-                "What’s worse: being predictable or being chaotic?",
-                "Predictable", "Chaotic",
-                answer => profile.fearsPredictability = answer)
+            new QuestionData("A firewall blocks your path. What do you do?",
+                "Force it open immediately", "Wait for it to weaken", answer => profile.prefersAggression = answer),
+            new QuestionData("You’re one move from winning. Trust instinct or analyze?",
+                "Go with my gut", "Calculate and confirm first", answer => profile.prefersControl = answer),
+            new QuestionData("You just lost a round. What now?",
+                "Strike back harders", "Adapt and shift tactics", answer => profile.seeksRevenge = answer),
+            new QuestionData("The opponent is watching your patterns. How do you act?",
+                "Throw in fake moves to confuse them", "Stick to solid, honest strategy", answer => profile.oftenBluffs = answer),
+            new QuestionData("Who would you rather have as your enemy ",
+                "Predictable and steady", "Unstable and random", answer => profile.fearsPredictability = answer)
         };
     }
 
@@ -136,28 +131,27 @@ public class QuestionnaireManager : MonoBehaviour
     }
 
     private void FinishQuiz()
-{
-    if (questionnairePanel != null)
-        questionnairePanel.SetActive(false); 
-
-    Debug.Log("Quiz complete. PlayerProfile seeded.");
-
-    AIManager ai = FindObjectOfType<AIManager>();
-    if (ai != null)
     {
-        ai.Initialize(profile);
-        Debug.Log("AIManager initialized with player profile.");
+        if (questionnairePanel != null)
+            questionnairePanel.SetActive(false);
+
+        Debug.Log("Quiz complete. PlayerProfile seeded.");
+
+        AIManager ai = FindObjectOfType<AIManager>();
+        if (ai != null)
+        {
+            ai.Initialize(profile);
+            Debug.Log("AIManager initialized with player profile.");
+        }
+        else
+        {
+            Debug.LogWarning("No AIManager found in scene.");
+        }
+
+        StartCoroutine(ShowSummaryAndFadeOut());
     }
-    else
-    {
-        Debug.LogWarning("No AIManager found in scene.");
-    }
 
-    StartCoroutine(ShowSummaryAndLoadScene());
-}
-
-
-    private IEnumerator ShowSummaryAndLoadScene()
+    private IEnumerator ShowSummaryAndFadeOut()
     {
         if (summaryPanel != null)
         {
@@ -167,10 +161,30 @@ public class QuestionnaireManager : MonoBehaviour
             unpredictabilityText.text = $"Unpredictability: {(profile.oftenBluffs ? 0.7f : 0.4f):F1}";
 
             if (continueButton != null)
-                continueButton.gameObject.SetActive(false); 
+                continueButton.gameObject.SetActive(false);
         }
 
         yield return new WaitForSeconds(2f);
+
+        // Fade to black
+        if (fadeCanvas != null)
+        {
+            float duration = 1.5f;
+            float elapsed = 0f;
+
+            fadeCanvas.blocksRaycasts = true;
+            fadeCanvas.interactable = true;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                fadeCanvas.alpha = Mathf.Lerp(0f, 1f, elapsed / duration);
+                yield return null;
+            }
+
+            fadeCanvas.alpha = 1f;
+        }
+
         SceneManager.LoadScene("MainScene");
     }
 
