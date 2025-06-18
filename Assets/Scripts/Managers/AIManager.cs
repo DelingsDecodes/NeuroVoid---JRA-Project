@@ -8,6 +8,8 @@ public class AIManager : MonoBehaviour
     public List<Move> playerMoveHistory;
     public Move currentAIMove;
 
+    private int currentPhase = 1;
+
     public void Initialize(PlayerProfile profileData)
     {
         profile = profileData;
@@ -20,6 +22,13 @@ public class AIManager : MonoBehaviour
             playerMoveHistory = new List<Move>();
 
         playerMoveHistory.Add(move);
+        UpdateStrategy(playerMoveHistory.Count);
+    }
+
+    public void UpdateStrategy(int round)
+    {
+        if (round > 3 && round <= 6) currentPhase = 2;
+        else if (round > 6) currentPhase = 3;
     }
 
     public Move DecideMove(Move[] availableMoves)
@@ -30,35 +39,45 @@ public class AIManager : MonoBehaviour
             return null;
         }
 
-        // EARLY GAME: use questionnaire profile to bias behavior
-        if (playerMoveHistory.Count == 0)
+        switch (currentPhase)
         {
-            if (profile != null)
-            {
-                if (profile.prefersAggression)
-                {
-                    // Counter aggression with control or reflection
-                    return FindMove(availableMoves, MoveType.Control)
-                        ?? FindMove(availableMoves, MoveType.Reflection)
-                        ?? GetRandomMove(availableMoves);
-                }
-                else if (profile.oftenBluffs)
-                {
-                    // Punish bluffing with direct force
-                    return FindMove(availableMoves, MoveType.Aggression)
-                        ?? GetRandomMove(availableMoves);
-                }
-            }
-
-            // Default: try tricking or confusing
-            return FindMove(availableMoves, MoveType.Bluff)
-                ?? GetRandomMove(availableMoves);
+            case 1:
+                return PredictBasedOnProfile(availableMoves);
+            case 2:
+                return PredictBasedOnHistory(availableMoves);
+            case 3:
+                return PredictFinalMove(availableMoves);
+            default:
+                return GetRandomMove(availableMoves);
         }
+    }
 
-        // MID GAME: React to last known move
+    private Move PredictBasedOnProfile(Move[] availableMoves)
+    {
+        if (profile != null)
+        {
+            if (profile.prefersAggression)
+            {
+                return FindMove(availableMoves, MoveType.Control)
+                    ?? FindMove(availableMoves, MoveType.Reflection)
+                    ?? GetRandomMove(availableMoves);
+            }
+            else if (profile.oftenBluffs)
+            {
+                return FindMove(availableMoves, MoveType.Aggression)
+                    ?? GetRandomMove(availableMoves);
+            }
+        }
+        return FindMove(availableMoves, MoveType.Bluff)
+            ?? GetRandomMove(availableMoves);
+    }
+
+    private Move PredictBasedOnHistory(Move[] availableMoves)
+    {
+        if (playerMoveHistory.Count == 0) return GetRandomMove(availableMoves);
+
         Move lastPlayerMove = playerMoveHistory[playerMoveHistory.Count - 1];
 
-        // Avoid repeating the same move type as the player
         foreach (Move move in availableMoves)
         {
             if (move.type != lastPlayerMove.type)
@@ -68,7 +87,6 @@ public class AIManager : MonoBehaviour
             }
         }
 
-        // Fallback: Just return something
         currentAIMove = availableMoves[0];
         return currentAIMove;
     }
@@ -81,24 +99,37 @@ public class AIManager : MonoBehaviour
             return null;
         }
 
-        // Use profile to infer possible final move
-        if (profile != null && profile.oftenBluffs)
+        // 15% chance to make a mistake to humanize AI
+        bool makeMistake = Random.value < 0.15f;
+        if (makeMistake)
         {
-            return FindMove(availableMoves, MoveType.Bluff)
-                ?? GetRandomMove(availableMoves);
+            return GetRandomMove(availableMoves);
         }
 
-        // Pattern recognition (simple repetition)
-        if (playerMoveHistory.Count >= 2)
-        {
-            Move last = playerMoveHistory[playerMoveHistory.Count - 1];
-            Move secondLast = playerMoveHistory[playerMoveHistory.Count - 2];
+        float aggressionScore = profile != null && profile.prefersAggression ? 0.8f : 0.2f;
+        float unpredictabilityScore = profile != null && profile.oftenBluffs ? 0.6f : 0.3f;
 
-            if (last.type == secondLast.type)
-                return last;
+        int aggressionCount = 0;
+        int controlCount = 0;
+        int bluffCount = 0;
+
+        foreach (Move move in playerMoveHistory)
+        {
+            if (move.type == MoveType.Aggression) aggressionCount++;
+            if (move.type == MoveType.Control) controlCount++;
+            if (move.type == MoveType.Bluff) bluffCount++;
         }
 
-        return GetRandomMove(availableMoves);
+        float scoreAggression = aggressionCount + aggressionScore + Random.Range(-0.2f, 0.2f);
+        float scoreControl = controlCount + (1 - aggressionScore);
+        float scoreBluff = bluffCount + unpredictabilityScore;
+
+        if (scoreAggression >= scoreControl && scoreAggression >= scoreBluff)
+            return FindMove(availableMoves, MoveType.Aggression) ?? GetRandomMove(availableMoves);
+        else if (scoreControl >= scoreBluff)
+            return FindMove(availableMoves, MoveType.Control) ?? GetRandomMove(availableMoves);
+        else
+            return FindMove(availableMoves, MoveType.Bluff) ?? GetRandomMove(availableMoves);
     }
 
     private Move FindMove(Move[] list, MoveType type)
@@ -108,7 +139,6 @@ public class AIManager : MonoBehaviour
             if (move.type == type)
                 return move;
         }
-
         return null;
     }
 
