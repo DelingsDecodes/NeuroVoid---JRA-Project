@@ -49,7 +49,7 @@ public class TauntGenerator
     private string GetRandomDefaultTaunt()
     {
         string[] genericTaunts = {
-            "You think I can't see through you? MWahah",
+            "You think I can't see through you? Mwahaha.",
             "Interesting move. Predictable, though.",
             "This duel is more transparent than you think.",
             "You repeat patterns even when I give you chances.",
