@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI aiTauntText;
     public TextMeshProUGUI roundCounterText;
     public TextMeshProUGUI roundLogText;
-    public ScrollRect roundLogScrollRect; 
+    public ScrollRect roundLogScrollRect;
 
     [Header("Summary Panel")]
     public GameObject summaryPanel;
@@ -36,13 +36,13 @@ public class UIManager : MonoBehaviour
     {
         if (moves == null || moves.Length == 0)
         {
-            Debug.LogError("UIManager: No moves provided to SetAvailableMoves.");
+            Debug.LogError("UIManager: No moves provided.");
             return;
         }
 
         if (moveButtons.Length != moves.Length || moveButtonLabels.Length != moves.Length)
         {
-            Debug.LogError("UIManager: Array size mismatch.");
+            Debug.LogError("UIManager: Button or label array length mismatch.");
             return;
         }
 
@@ -51,7 +51,6 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < moves.Length; i++)
         {
             int index = i;
-
             if (moveButtonLabels[i] != null)
                 moveButtonLabels[i].text = moves[i].name;
 
@@ -67,19 +66,18 @@ public class UIManager : MonoBehaviour
     {
         if (availableMoves == null || index >= availableMoves.Length)
         {
-            Debug.LogError("UIManager: Invalid move selection.");
+            Debug.LogError("UIManager: Invalid move button index.");
             return;
         }
 
-        Move selectedMove = availableMoves[index];
-        gameManager.PlayerSelectedMove(selectedMove);
+        gameManager.PlayerSelectedMove(availableMoves[index]);
     }
 
     public void ShowAITaunt(string taunt)
     {
         if (aiSpeechText == null || aiSpeechGroup == null)
         {
-            Debug.LogWarning("UIManager: aiSpeechText or aiSpeechGroup not assigned.");
+            Debug.LogWarning("UIManager: AI speech UI missing.");
             return;
         }
 
@@ -89,50 +87,42 @@ public class UIManager : MonoBehaviour
         aiSpeechGroup.gameObject.SetActive(true);
 
         LeanTween.cancel(aiSpeechGroup.gameObject);
-        LeanTween.alphaCanvas(aiSpeechGroup, 1f, 0.4f).setEaseOutQuad()
-            .setOnComplete(() =>
+        LeanTween.alphaCanvas(aiSpeechGroup, 1f, 0.4f).setEaseOutQuad().setOnComplete(() =>
+        {
+            StartCoroutine(TypeText(aiSpeechText, taunt, 0.02f));
+            LeanTween.delayedCall(aiSpeechGroup.gameObject, 4.5f, () =>
             {
-                StartCoroutine(TypeText(taunt));
-                LeanTween.delayedCall(aiSpeechGroup.gameObject, 4.5f, () =>
-                {
-                    LeanTween.alphaCanvas(aiSpeechGroup, 0f, 0.4f).setEaseInQuad();
-                });
+                LeanTween.alphaCanvas(aiSpeechGroup, 0f, 0.4f).setEaseInQuad();
             });
+        });
     }
 
     public void ShowPlayerSpeech(string text)
     {
-        if (playerSpeechGroup == null || playerSpeechText == null) return;
+        if (playerSpeechText == null || playerSpeechGroup == null)
+        {
+            Debug.LogWarning("UIManager: Player speech UI missing.");
+            return;
+        }
 
         playerSpeechText.text = "";
         playerSpeechGroup.alpha = 0;
         playerSpeechGroup.gameObject.SetActive(true);
 
-        StartCoroutine(Typewriter(playerSpeechText, text, 0.03f));
-        LeanTween.alphaCanvas(playerSpeechGroup, 1f, 0.4f).setEaseOutQuad()
-            .setOnComplete(() =>
-            {
-                LeanTween.delayedCall(playerSpeechGroup.gameObject, 4.5f, () =>
-                {
-                    LeanTween.alphaCanvas(playerSpeechGroup, 0f, 0.4f).setEaseInQuad();
-                });
-            });
-    }
-
-    private IEnumerator TypeText(string message)
-    {
-        aiSpeechText.text = "";
-        foreach (char letter in message.ToCharArray())
+        StartCoroutine(TypeText(playerSpeechText, text, 0.03f));
+        LeanTween.alphaCanvas(playerSpeechGroup, 1f, 0.4f).setEaseOutQuad().setOnComplete(() =>
         {
-            aiSpeechText.text += letter;
-            yield return new WaitForSeconds(0.02f);
-        }
+            LeanTween.delayedCall(playerSpeechGroup.gameObject, 4.5f, () =>
+            {
+                LeanTween.alphaCanvas(playerSpeechGroup, 0f, 0.4f).setEaseInQuad();
+            });
+        });
     }
 
-    private IEnumerator Typewriter(TextMeshProUGUI textComponent, string message, float delay)
+    private IEnumerator TypeText(TextMeshProUGUI textComponent, string message, float delay)
     {
         textComponent.text = "";
-        foreach (char c in message.ToCharArray())
+        foreach (char c in message)
         {
             textComponent.text += c;
             yield return new WaitForSeconds(delay);
@@ -150,9 +140,7 @@ public class UIManager : MonoBehaviour
     public void UpdateRoundCounter(int round, int total)
     {
         if (roundCounterText != null)
-        {
             roundCounterText.text = $"Round {round} / {total}";
-        }
     }
 
     public void DisplaySummary(string summary)
@@ -164,41 +152,30 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("UIManager: Summary UI not assigned.");
+            Debug.LogWarning("UIManager: Summary panel or text not assigned.");
         }
     }
 
     public void AppendToRoundLog(string roundInfo, string outcome)
-{
-    if (roundLogText != null)
     {
-        string colorTag;
+        if (roundLogText == null) return;
 
-        switch (outcome)
+        string colorTag = outcome switch
         {
-            case "win":
-                colorTag = "<color=green>";
-                break;
-            case "loss":
-                colorTag = "<color=red>";
-                break;
-            case "tie":
-            default:
-                colorTag = "<color=gray>";
-                break;
-        }
+            "win" => "<color=green>",
+            "loss" => "<color=red>",
+            "tie" => "<color=gray>",
+            _ => "<color=white>"
+        };
 
         roundLogText.text += $"{colorTag}{roundInfo}</color>\n";
         StartCoroutine(ScrollToBottomNextFrame());
     }
-}
 
     private IEnumerator ScrollToBottomNextFrame()
-{
-    yield return null;
-    if (roundLogScrollRect != null)
     {
-        roundLogScrollRect.verticalNormalizedPosition = 0f;
+        yield return null;
+        if (roundLogScrollRect != null)
+            roundLogScrollRect.verticalNormalizedPosition = 0f;
     }
-}
 }

@@ -8,7 +8,7 @@ public class AIManager : MonoBehaviour
     public List<Move> playerMoveHistory;
     public Move currentAIMove;
 
-    private int currentPhase = 1; // 1 = early, 2 = mid, 3 = final
+    private int currentPhase = 1; 
 
     public void Initialize(PlayerProfile profileData)
     {
@@ -52,11 +52,11 @@ public class AIManager : MonoBehaviour
 
     private Move PredictBasedOnProfile(Move[] availableMoves)
     {
-        if (profile == null) return GetRandomMove(availableMoves);
+        if (profile == null)
+            return GetRandomMove(availableMoves);
 
         if (profile.prefersAggression)
         {
-            // Counter aggression with control or reflection
             return FindMove(availableMoves, MoveType.Control)
                 ?? FindMove(availableMoves, MoveType.Reflection)
                 ?? GetRandomMove(availableMoves);
@@ -64,12 +64,10 @@ public class AIManager : MonoBehaviour
 
         if (profile.oftenBluffs)
         {
-            // Counter bluffing with aggressive pressure
             return FindMove(availableMoves, MoveType.Aggression)
                 ?? GetRandomMove(availableMoves);
         }
 
-        // Default profile counter
         return FindMove(availableMoves, MoveType.Bluff)
             ?? GetRandomMove(availableMoves);
     }
@@ -81,7 +79,6 @@ public class AIManager : MonoBehaviour
 
         Move lastPlayerMove = playerMoveHistory[playerMoveHistory.Count - 1];
 
-        // Try choosing something different than what the player just did
         foreach (Move move in availableMoves)
         {
             if (move.type != lastPlayerMove.type)
@@ -91,7 +88,6 @@ public class AIManager : MonoBehaviour
             }
         }
 
-        // Fallback: just pick first option
         currentAIMove = availableMoves[0];
         return currentAIMove;
     }
@@ -104,35 +100,38 @@ public class AIManager : MonoBehaviour
             return null;
         }
 
-        // 15% chance AI makes a mistake to seem more human
+        // 15% chance AI makes a mistake to seem human
         if (Random.value < 0.15f)
             return GetRandomMove(availableMoves);
 
-        // Influence scores based on profile
+        // Profile bias
         float aggressionBias = profile?.prefersAggression == true ? 0.8f : 0.2f;
         float bluffBias = profile?.oftenBluffs == true ? 0.6f : 0.3f;
 
-        // Count player move history
-        int aggressionCount = 0, controlCount = 0, bluffCount = 0;
+        float aggressionScore = 0f;
+        float controlScore = 0f;
+        float bluffScore = 0f;
 
-        foreach (var move in playerMoveHistory)
+        float decay = 1.0f; // Memory decay factor
+        for (int i = playerMoveHistory.Count - 1; i >= 0; i--)
         {
-            switch (move.type)
-            {
-                case MoveType.Aggression: aggressionCount++; break;
-                case MoveType.Control: controlCount++; break;
-                case MoveType.Bluff: bluffCount++; break;
-            }
+            Move move = playerMoveHistory[i];
+            float weight = decay;
+
+            if (move.type == MoveType.Aggression) aggressionScore += weight;
+            if (move.type == MoveType.Control) controlScore += weight;
+            if (move.type == MoveType.Bluff) bluffScore += weight;
+
+            decay *= 0.85f; // Decay older moves
         }
 
-        float scoreAggression = aggressionCount + aggressionBias + Random.Range(-0.2f, 0.2f);
-        float scoreControl = controlCount + (1 - aggressionBias);
-        float scoreBluff = bluffCount + bluffBias;
+        aggressionScore += aggressionBias + Random.Range(-0.2f, 0.2f);
+        controlScore += (1 - aggressionBias);
+        bluffScore += bluffBias;
 
-        // Choose move with highest score
-        if (scoreAggression >= scoreControl && scoreAggression >= scoreBluff)
+        if (aggressionScore >= controlScore && aggressionScore >= bluffScore)
             return FindMove(availableMoves, MoveType.Aggression) ?? GetRandomMove(availableMoves);
-        else if (scoreControl >= scoreBluff)
+        else if (controlScore >= bluffScore)
             return FindMove(availableMoves, MoveType.Control) ?? GetRandomMove(availableMoves);
         else
             return FindMove(availableMoves, MoveType.Bluff) ?? GetRandomMove(availableMoves);
