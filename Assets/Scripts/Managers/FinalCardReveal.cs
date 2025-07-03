@@ -1,3 +1,4 @@
+﻿using System.Collections; // ✅ REQUIRED for IEnumerator
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
