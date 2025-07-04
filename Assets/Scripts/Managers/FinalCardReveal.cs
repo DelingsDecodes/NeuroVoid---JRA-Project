@@ -1,4 +1,4 @@
-﻿using System.Collections; // ✅ REQUIRED for IEnumerator
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -8,7 +8,6 @@ public class FinalCardReveal : MonoBehaviour
     public Image cardFront;
     public Image cardBack;
     public TextMeshProUGUI moveNameText;
-
     public float revealDelay = 2.5f;
 
     void Start()
