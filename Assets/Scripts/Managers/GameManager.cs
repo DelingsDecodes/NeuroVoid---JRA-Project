@@ -1,4 +1,4 @@
-﻿﻿using UnityEngine;
+﻿using UnityEngine;
 using System.Linq;
 
 public class GameManager : MonoBehaviour
@@ -48,51 +48,49 @@ public class GameManager : MonoBehaviour
         UnlockAllCards();
     }
 
-   public void PlayerSelectedMove(Move move)
-{
-    if (move == null)
+    public void PlayerSelectedMove(Move move)
     {
-        Debug.LogError("GameManager: PlayerSelectedMove received a null move.");
-        return;
+        if (move == null)
+        {
+            Debug.LogError("GameManager: PlayerSelectedMove received a null move.");
+            return;
+        }
+
+        Debug.Log($"Player selected: {move.name}");
+
+        aiManager.ObservePlayerMove(move);
+        Move aiMove = aiManager.DecideMove(allMoves);
+        Debug.Log($"AI played: {aiMove.name}");
+
+        // Show taunt in pixel bubble
+        string taunt = tauntGenerator.GenerateTaunt(currentRound);
+        uiManager.ShowAITaunt(taunt);
+
+        // Log round
+        playerManager.AddMove(move);
+        memoryLog.LogRound(currentRound, move, aiMove);
+
+        // Round outcome
+        string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
+        string outcomeType = GetOutcomeType(move.name, aiMove.name);
+
+        // Log to round log with color
+        uiManager.AppendToRoundLog($"Round {currentRound}: You played {move.name}, AI played {aiMove.name}", outcomeType);
+
+        // Show outcome
+        roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
+
+        currentRound++;
+        if (currentRound <= totalRounds)
+        {
+            uiManager.UpdateRoundCounter(currentRound, totalRounds);
+            UnlockAllCards();
+        }
+        else
+        {
+            EndGame();
+        }
     }
-
-    Debug.Log($"Player selected: {move.name}");
-
-    aiManager.ObservePlayerMove(move);
-    Move aiMove = aiManager.DecideMove(allMoves);
-    Debug.Log($"AI played: {aiMove.name}");
-
-    // Show taunt in pixel bubble
-    string taunt = tauntGenerator.GenerateTaunt(currentRound);
-    uiManager.ShowAITaunt(taunt);
-
-    // Log round
-    playerManager.AddMove(move);
-    memoryLog.LogRound(currentRound, move, aiMove);
-
-    // Round outcome
-    string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
-    string outcomeType = GetOutcomeType(move.name, aiMove.name);
-
-    // Log to round log with color
-    uiManager.AppendToRoundLog($"Round {currentRound}: You played {move.name}, AI played {aiMove.name}", outcomeType);
-
-    // Show outcome
-    roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
-
-    currentRound++;
-    if (currentRound <= totalRounds)
-    {
-        uiManager.UpdateRoundCounter(currentRound, totalRounds);
-        UnlockAllCards();
-    }
-    else
-    {
-        EndGame();
-    }
-}
-
-
 
     private void EndGame()
     {
@@ -100,9 +98,11 @@ public class GameManager : MonoBehaviour
 
         Move prediction = aiManager.PredictFinalMove(allMoves);
         string result = $"Game over. My final prediction is: {prediction.name}";
-        uiManager.ShowAITaunt(result); //Replaced with bubble fade-in
+        uiManager.ShowAITaunt(result);
 
-        postGameSummary.ShowSummary(allMoves, prediction);
+        GameResults.playerFinalMove = playerManager.GetLastPlayerMove().name;
+        GameResults.aiFinalMove = prediction.name;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("FinalRevealScene");
     }
 
     // Shortcut methods for buttons
@@ -141,18 +141,15 @@ public class GameManager : MonoBehaviour
         else return " They slipped past your move...";
     }
 
-
-
     private string GetOutcomeType(string player, string ai)
-{
-    if (player == ai)
-        return "tie";
-    else if (player == "Surge" && ai == "Null") return "win";
-    else if (player == "Disrupt" && ai == "Surge") return "win";
-    else if (player == "Loop" && ai == "Disrupt") return "win";
-    else if (player == "Fracture" && ai == "Loop") return "win";
-    else if (player == "Null" && ai == "Fracture") return "win";
-    else return "loss";
-}
-
+    {
+        if (player == ai)
+            return "tie";
+        else if (player == "Surge" && ai == "Null") return "win";
+        else if (player == "Disrupt" && ai == "Surge") return "win";
+        else if (player == "Loop" && ai == "Disrupt") return "win";
+        else if (player == "Fracture" && ai == "Loop") return "win";
+        else if (player == "Null" && ai == "Fracture") return "win";
+        else return "loss";
+    }
 }
