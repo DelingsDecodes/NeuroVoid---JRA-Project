@@ -625,8 +625,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardFront: {fileID: 2143586726}
-  cardBack: {fileID: 0}
-  moveNameText: {fileID: 0}
+  cardBack: {fileID: 1766776228}
+  moveNameText: {fileID: 406071103}
   revealDelay: 2.5
 --- !u!4 &2059038403
 Transform:
