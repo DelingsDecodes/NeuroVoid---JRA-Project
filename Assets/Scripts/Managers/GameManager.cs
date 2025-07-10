@@ -96,12 +96,16 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Game Over");
 
+        // Predict AI's final move
         Move prediction = aiManager.PredictFinalMove(allMoves);
         string result = $"Game over. My final prediction is: {prediction.name}";
         uiManager.ShowAITaunt(result);
 
+        // Store results for final reveal scene
         GameResults.playerFinalMove = playerManager.GetLastPlayerMove().name;
         GameResults.aiFinalMove = prediction.name;
+
+        //  Load final reveal scene
         UnityEngine.SceneManagement.SceneManager.LoadScene("FinalRevealScene");
     }
 
