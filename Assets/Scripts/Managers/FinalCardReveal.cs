@@ -19,8 +19,7 @@ public class FinalCardReveal : MonoBehaviour
 
     void Start()
     {
-
-        cardFront.gameObject.SetActive(false);
+      
         cardFront.transform.localScale = new Vector3(0, 1, 1);
 
         aiCardFront.gameObject.SetActive(false);
@@ -37,26 +36,25 @@ public class FinalCardReveal : MonoBehaviour
     {
         yield return new WaitForSeconds(revealDelay);
 
-  
+
         LeanTween.scaleX(cardBack.gameObject, 0, 0.4f).setEaseInBack();
         LeanTween.scaleX(aiCardBack.gameObject, 0, 0.4f).setEaseInBack();
 
         yield return new WaitForSeconds(0.4f);
 
-    
+
         cardBack.gameObject.SetActive(false);
         aiCardBack.gameObject.SetActive(false);
 
         cardFront.gameObject.SetActive(true);
         aiCardFront.gameObject.SetActive(true);
 
-   
+     
         LeanTween.scaleX(cardFront.gameObject, 1, 0.4f).setEaseOutBack();
         LeanTween.scaleX(aiCardFront.gameObject, 1, 0.4f).setEaseOutBack();
 
-   
-        moveNameText.text = GameResults.playerFinalMove;
-        aiMoveNameText.text = GameResults.aiFinalMove;
+        moveNameText.text = GameResults.Instance.playerFinalMove.ToString();
+        aiMoveNameText.text = GameResults.Instance.aiFinalMove.ToString();
 
         moveNameText.gameObject.SetActive(true);
         aiMoveNameText.gameObject.SetActive(true);
