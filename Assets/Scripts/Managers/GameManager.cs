@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Linq;
+using UnityEngine.SceneManagement; // Required for scene loading
 
 public class GameManager : MonoBehaviour
 {
@@ -21,7 +22,6 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager Start() running");
 
-        // Check all references
         if (uiManager == null || playerManager == null || aiManager == null ||
             memoryLog == null || questionnaireManager == null || postGameSummary == null || roundResultDisplay == null)
         {
@@ -29,7 +29,6 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Load moves
         allMoves = MoveLoader.LoadMoves();
         if (allMoves == null || allMoves.Length == 0)
         {
@@ -37,12 +36,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // Setup AI and taunts
         PlayerProfile profile = questionnaireManager.GetProfile();
         aiManager.Initialize(profile);
         tauntGenerator = new TauntGenerator(profile, memoryLog);
 
-        // UI setup
         uiManager.SetAvailableMoves(allMoves);
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
         UnlockAllCards();
@@ -62,22 +59,17 @@ public class GameManager : MonoBehaviour
         Move aiMove = aiManager.DecideMove(allMoves);
         Debug.Log($"AI played: {aiMove.name}");
 
-        // Show taunt in pixel bubble
         string taunt = tauntGenerator.GenerateTaunt(currentRound);
         uiManager.ShowAITaunt(taunt);
 
-        // Log round
         playerManager.AddMove(move);
         memoryLog.LogRound(currentRound, move, aiMove);
 
-        // Round outcome
         string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
         string outcomeType = GetOutcomeType(move.name, aiMove.name);
 
-        // Log to round log with color
         uiManager.AppendToRoundLog($"Round {currentRound}: You played {move.name}, AI played {aiMove.name}", outcomeType);
 
-        // Show outcome
         roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
 
         currentRound++;
@@ -96,20 +88,19 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Game Over");
 
-        // Predict AI's final move
         Move prediction = aiManager.PredictFinalMove(allMoves);
         string result = $"Game over. My final prediction is: {prediction.name}";
         uiManager.ShowAITaunt(result);
 
-        // Store results for final reveal scene
-        GameResults.playerFinalMove = playerManager.GetLastPlayerMove().name;
-        GameResults.aiFinalMove = prediction.name;
+        //  Store results using singleton
+        GameResults.Instance.playerFinalMove = playerManager.GetLastPlayerMove();
+        GameResults.Instance.aiFinalMove = prediction;
 
         //  Load final reveal scene
-        UnityEngine.SceneManagement.SceneManager.LoadScene("FinalRevealScene");
+        SceneManager.LoadScene("FinalRevealScene");
     }
 
-    // Shortcut methods for buttons
+    // Shortcut methods
     public void SelectSurge() => PlayerSelectedMove(GetMoveByName("Surge"));
     public void SelectDisrupt() => PlayerSelectedMove(GetMoveByName("Disrupt"));
     public void SelectLoop() => PlayerSelectedMove(GetMoveByName("Loop"));
@@ -119,7 +110,7 @@ public class GameManager : MonoBehaviour
     private Move GetMoveByName(string name)
     {
         var move = allMoves.FirstOrDefault(m => m.name == name);
-        if (move == null) Debug.LogWarning($"Move '{name}' not found in Move list.");
+        if (move == null) Debug.LogWarning($"Move '{name}' not found.");
         return move;
     }
 
@@ -132,11 +123,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Determine round outcome description
     private string GetRoundOutcome(string player, string ai)
     {
-        if (player == ai)
-            return " A perfect clash!";
+        if (player == ai) return " A perfect clash!";
         else if (player == "Surge" && ai == "Null") return " You overwhelmed their defense!";
         else if (player == "Disrupt" && ai == "Surge") return " You intercepted them!";
         else if (player == "Loop" && ai == "Disrupt") return " You broke their pattern!";
@@ -147,8 +136,7 @@ public class GameManager : MonoBehaviour
 
     private string GetOutcomeType(string player, string ai)
     {
-        if (player == ai)
-            return "tie";
+        if (player == ai) return "tie";
         else if (player == "Surge" && ai == "Null") return "win";
         else if (player == "Disrupt" && ai == "Surge") return "win";
         else if (player == "Loop" && ai == "Disrupt") return "win";

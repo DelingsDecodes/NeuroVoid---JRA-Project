@@ -1,9 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public static class GameResults
+public class GameResults : MonoBehaviour
 {
-    public static string playerFinalMove;
-    public static string aiFinalMove;
+    public static GameResults Instance { get; private set; }
+
+    public Move playerFinalMove;
+    public Move aiFinalMove;
+
+    private void Awake()
+    {
+        
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject); 
+    }
 }
