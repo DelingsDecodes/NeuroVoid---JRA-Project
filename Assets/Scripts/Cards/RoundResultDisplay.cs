@@ -1,25 +1,41 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class RoundResultDisplay : MonoBehaviour
 {
-    public CanvasGroup canvasGroup;
-    public TextMeshProUGUI resultText;
+    [SerializeField] private CanvasGroup resultCanvasGroup;
+    [SerializeField] private TextMeshProUGUI resultText;
 
-    private float showDuration = 2f;
-
-    public void ShowResult(string playerMove, string aiMove, string outcome)
+    private void Awake()
     {
-        resultText.text = $"You played <b>{playerMove}</b>\n AI played <b>{aiMove}</b>\n{outcome}";
+        if (resultCanvasGroup != null)
+        {
+            resultCanvasGroup.alpha = 0f;
+        }
+    }
+
+    public void ShowResult(string playerMove, string aiMove, string outcomeMessage)
+    {
+        if (resultCanvasGroup == null || resultText == null)
+        {
+            Debug.LogWarning("RoundResultDisplay: Missing UI references.");
+            return;
+        }
+
+        resultText.text = $"You played {playerMove}, AI played {aiMove}.{outcomeMessage}";
 
         // Fade in
-        LeanTween.alphaCanvas(canvasGroup, 1f, 0.5f).setOnComplete(() =>
+        if (resultCanvasGroup != null)
         {
-            // Wait then fade out
-            LeanTween.delayedCall(showDuration, () =>
+            LeanTween.alphaCanvas(resultCanvasGroup, 1f, 0.5f).setOnComplete(() =>
             {
-                LeanTween.alphaCanvas(canvasGroup, 0f, 0.5f);
+             
+                if (resultCanvasGroup != null)
+                {
+                    LeanTween.alphaCanvas(resultCanvasGroup, 0f, 0.5f).setDelay(1.5f);
+                }
             });
-        });
+        }
     }
 }
