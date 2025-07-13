@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Linq;
-using UnityEngine.SceneManagement; // Required for scene loading
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,13 +11,13 @@ public class GameManager : MonoBehaviour
     public MemoryLog memoryLog;
     public QuestionnaireManager questionnaireManager;
     public PostGameSummary postGameSummary;
-    public RoundResultDisplay roundResultDisplay; 
+    public RoundResultDisplay roundResultDisplay;
 
     public Move[] allMoves;
     private TauntGenerator tauntGenerator;
 
     private int currentRound = 1;
-    private int totalRounds = 5;
+    private int totalRounds = 1; 
 
     void Start()
     {
@@ -60,7 +61,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"AI played: {aiMove.name}");
 
         string taunt = tauntGenerator.GenerateTaunt(currentRound);
-        uiManager.ShowAITaunt(taunt);
+        
 
         playerManager.AddMove(move);
         memoryLog.LogRound(currentRound, move, aiMove);
@@ -68,39 +69,23 @@ public class GameManager : MonoBehaviour
         string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
         string outcomeType = GetOutcomeType(move.name, aiMove.name);
 
-        uiManager.AppendToRoundLog($"Round {currentRound}: You played {move.name}, AI played {aiMove.name}", outcomeType);
+        uiManager.AppendToRoundLog($"You played {move.name}, AI played {aiMove.name}", outcomeType);
 
         roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
 
-        currentRound++;
-        if (currentRound <= totalRounds)
-        {
-            uiManager.UpdateRoundCounter(currentRound, totalRounds);
-            UnlockAllCards();
-        }
-        else
-        {
-            EndGame();
-        }
+        // Store results immediately and switch scene
+        GameResults.Instance.playerFinalMove = move;
+        GameResults.Instance.aiFinalMove = aiMove;
+
+        StartCoroutine(DelayedSceneSwitch()); // Give time to show result
     }
 
-    private void EndGame()
+    private IEnumerator DelayedSceneSwitch()
     {
-        Debug.Log("Game Over");
-
-        Move prediction = aiManager.PredictFinalMove(allMoves);
-        string result = $"Game over. My final prediction is: {prediction.name}";
-        uiManager.ShowAITaunt(result);
-
-        //  Store results using singleton
-        GameResults.Instance.playerFinalMove = playerManager.GetLastPlayerMove();
-        GameResults.Instance.aiFinalMove = prediction;
-
-        //  Load final reveal scene
+        yield return new WaitForSeconds(1.5f);
         SceneManager.LoadScene("FinalRevealScene");
     }
 
-    // Shortcut methods
     public void SelectSurge() => PlayerSelectedMove(GetMoveByName("Surge"));
     public void SelectDisrupt() => PlayerSelectedMove(GetMoveByName("Disrupt"));
     public void SelectLoop() => PlayerSelectedMove(GetMoveByName("Loop"));
