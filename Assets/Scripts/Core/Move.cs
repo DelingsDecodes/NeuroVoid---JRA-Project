@@ -7,6 +7,7 @@ public class Move
     public string name;           // e.g., "Surge"
     public string description;    // Tooltip or hint
     public MoveType type;         // AI/psychological category
+    public Sprite artwork; 
 }
 
 public enum MoveType
