@@ -22,6 +22,16 @@ public static class MoveLoader
             return null;
         }
 
+       
+        foreach (Move move in moveList.moves)
+        {
+            move.artwork = Resources.Load<Sprite>("Moves/" + move.name);
+            if (move.artwork == null)
+            {
+                Debug.LogWarning($"MoveLoader: Missing sprite for move: {move.name}");
+            }
+        }
+
         return moveList.moves;
     }
 
