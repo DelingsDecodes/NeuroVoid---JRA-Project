@@ -22,14 +22,12 @@ public static class MoveLoader
             return null;
         }
 
-       
-        foreach (Move move in moveList.moves)
+        foreach (var move in moveList.moves)
         {
-            move.artwork = Resources.Load<Sprite>("Moves/" + move.name);
+            
+            move.artwork = Resources.Load<Sprite>("CardArt/" + move.name);
             if (move.artwork == null)
-            {
-                Debug.LogWarning($"MoveLoader: Missing sprite for move: {move.name}");
-            }
+                Debug.LogWarning("Missing sprite for move: " + move.name);
         }
 
         return moveList.moves;
