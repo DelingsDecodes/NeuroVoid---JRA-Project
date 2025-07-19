@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     private TauntGenerator tauntGenerator;
 
     private int currentRound = 1;
-    private int totalRounds = 1; 
+    private int totalRounds = 1;
 
     void Start()
     {
@@ -61,7 +61,6 @@ public class GameManager : MonoBehaviour
         Debug.Log($"AI played: {aiMove.name}");
 
         string taunt = tauntGenerator.GenerateTaunt(currentRound);
-        
 
         playerManager.AddMove(move);
         memoryLog.LogRound(currentRound, move, aiMove);
@@ -70,14 +69,14 @@ public class GameManager : MonoBehaviour
         string outcomeType = GetOutcomeType(move.name, aiMove.name);
 
         uiManager.AppendToRoundLog($"You played {move.name}, AI played {aiMove.name}", outcomeType);
-
         roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
 
-        // Store results immediately and switch scene
+        // Store final data for reveal scene
         GameResults.Instance.playerFinalMove = move;
         GameResults.Instance.aiFinalMove = aiMove;
+        GameResults.Instance.finalTaunt = taunt;  
 
-        StartCoroutine(DelayedSceneSwitch()); // Give time to show result
+        StartCoroutine(DelayedSceneSwitch());
     }
 
     private IEnumerator DelayedSceneSwitch()
