@@ -2,21 +2,22 @@ using UnityEngine;
 
 public class GameResults : MonoBehaviour
 {
-    public static GameResults Instance { get; private set; }
+    public static GameResults Instance;
 
     public Move playerFinalMove;
     public Move aiFinalMove;
+    public string finalTaunt;  
 
-    private void Awake()
+    void Awake()
     {
-        
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
-            return;
         }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject); 
+        else
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
     }
 }
