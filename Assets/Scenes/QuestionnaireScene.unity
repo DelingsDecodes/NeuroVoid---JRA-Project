@@ -1426,10 +1426,12 @@ MonoBehaviour:
     name: 
     description: 
     type: 0
+    artwork: {fileID: 0}
   aiFinalMove:
     name: 
     description: 
     type: 0
+    artwork: {fileID: 0}
 --- !u!4 &1035048678
 Transform:
   m_ObjectHideFlags: 0
@@ -2437,8 +2439,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00018310547}
-  m_SizeDelta: {x: 0, y: 0.0004}
+  m_AnchoredPosition: {x: 10.4236145, y: 0.00018310547}
+  m_SizeDelta: {x: 20.8472, y: 0.0004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
