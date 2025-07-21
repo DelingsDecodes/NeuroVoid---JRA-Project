@@ -22,6 +22,7 @@ public class FinalCardReveal : MonoBehaviour
 
     void Start()
     {
+        // Hide fronts and prepare for flip
         SetupCard(cardFront);
         SetupCard(aiCardFront);
 
@@ -42,15 +43,15 @@ public class FinalCardReveal : MonoBehaviour
     {
         yield return new WaitForSeconds(revealDelay);
 
-
+        // Flip backs
         LeanTween.scaleX(cardBack.gameObject, 0, flipDuration).setEaseInBack();
         LeanTween.scaleX(aiCardBack.gameObject, 0, flipDuration).setEaseInBack();
 
         yield return new WaitForSeconds(flipDuration);
 
+        // Hide backs and set artwork
         cardBack.gameObject.SetActive(false);
         aiCardBack.gameObject.SetActive(false);
-
 
         cardFront.sprite = GameResults.Instance.playerFinalMove.artwork;
         aiCardFront.sprite = GameResults.Instance.aiFinalMove.artwork;
@@ -58,11 +59,13 @@ public class FinalCardReveal : MonoBehaviour
         cardFront.gameObject.SetActive(true);
         aiCardFront.gameObject.SetActive(true);
 
+        // Flip fronts in
         LeanTween.scaleX(cardFront.gameObject, 1, flipDuration).setEaseOutBack();
         LeanTween.scaleX(aiCardFront.gameObject, 1, flipDuration).setEaseOutBack();
 
         yield return new WaitForSeconds(flipDuration);
 
+        // Show move names
         moveNameText.text = GameResults.Instance.playerFinalMove.name;
         aiMoveNameText.text = GameResults.Instance.aiFinalMove.name;
 
@@ -71,19 +74,11 @@ public class FinalCardReveal : MonoBehaviour
 
         yield return new WaitForSeconds(0.6f); 
 
+        // Show taunt stored from GameManager
         if (tauntText != null)
         {
-            tauntText.text = GetAITaunt();
+            tauntText.text = GameResults.Instance.finalTaunt;
             tauntText.gameObject.SetActive(true);
         }
-    }
-
-    string GetAITaunt()
-    {
-        string aiMove = GameResults.Instance.aiFinalMove.name;
-        string playerMove = GameResults.Instance.playerFinalMove.name;
-
-        if (aiMove == playerMove) return "A clash of minds... evenly matched.";
-        return $"You chose {playerMove}? Predictable.";
     }
 }
