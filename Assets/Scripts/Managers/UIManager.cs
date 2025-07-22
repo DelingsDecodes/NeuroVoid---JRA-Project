@@ -8,6 +8,9 @@ public class UIManager : MonoBehaviour
 {
     public GameManager gameManager;
 
+    [Header("UI Container")]  
+    public GameObject mainUIContainer;
+
     [Header("Move Buttons")]
     public Button[] moveButtons;
     public TextMeshProUGUI[] moveButtonLabels;
@@ -177,5 +180,18 @@ public class UIManager : MonoBehaviour
         yield return null;
         if (roundLogScrollRect != null)
             roundLogScrollRect.verticalNormalizedPosition = 0f;
+    }
+
+   
+    public void HideUI()
+    {
+        if (mainUIContainer != null)
+            mainUIContainer.SetActive(false);
+    }
+
+    public void ShowUI()
+    {
+        if (mainUIContainer != null)
+            mainUIContainer.SetActive(true);
     }
 }
