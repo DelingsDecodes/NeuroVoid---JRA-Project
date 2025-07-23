@@ -24,10 +24,14 @@ public static class MoveLoader
 
         foreach (var move in moveList.moves)
         {
-            
+           
+
             move.artwork = Resources.Load<Sprite>("CardArt/" + move.name);
+
             if (move.artwork == null)
-                Debug.LogWarning("Missing sprite for move: " + move.name);
+            {
+                Debug.LogWarning($"MoveLoader: No sprite found for {move.name} in Resources/CardArt/");
+            }
         }
 
         return moveList.moves;
