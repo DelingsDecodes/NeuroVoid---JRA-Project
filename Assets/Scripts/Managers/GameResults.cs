@@ -6,7 +6,10 @@ public class GameResults : MonoBehaviour
 
     public Move playerFinalMove;
     public Move aiFinalMove;
-    public string finalTaunt;  
+    public string finalTaunt;
+
+    public int currentRound = 1;
+    public int totalRounds = 5; 
 
     void Awake()
     {
@@ -19,5 +22,12 @@ public class GameResults : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+    }
+
+    public void ClearRoundMoves()
+    {
+        playerFinalMove = null;
+        aiFinalMove = null;
+        finalTaunt = "";
     }
 }
