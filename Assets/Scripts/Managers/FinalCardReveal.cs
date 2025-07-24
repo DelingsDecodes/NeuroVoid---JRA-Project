@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class FinalCardReveal : MonoBehaviour
 {
@@ -17,8 +18,9 @@ public class FinalCardReveal : MonoBehaviour
 
     [Header("Post Flip")]
     public TextMeshProUGUI tauntText;
-    public float revealDelay = 2.5f;
-    public float flipDuration = 0.4f;
+    public float revealDelay = 1.0f;
+    public float flipDuration = 0.2f;
+    public float returnDelay = 1.5f; // time to wait after taunt before returning
 
     void Start()
     {
@@ -79,6 +81,21 @@ public class FinalCardReveal : MonoBehaviour
         {
             tauntText.text = GameResults.Instance.finalTaunt;
             tauntText.gameObject.SetActive(true);
+        }
+
+        // Wait, then go back to game or end
+        yield return new WaitForSeconds(returnDelay);
+
+        GameResults.Instance.currentRound++;
+
+        if (GameResults.Instance.currentRound > GameResults.Instance.totalRounds)
+        {
+            SceneManager.LoadScene("SummaryScene"); // or EndGameScene
+        }
+        else
+        {
+            GameResults.Instance.ClearRoundMoves(); // reset taunt and moves
+            SceneManager.LoadScene("MainScene"); // go back to card selection
         }
     }
 }
