@@ -44,6 +44,13 @@ public class GameManager : MonoBehaviour
         uiManager.SetAvailableMoves(allMoves);
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
         UnlockAllCards();
+
+        
+        if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt))
+        {
+            StartCoroutine(ShowDelayedTaunt(GameResults.Instance.finalTaunt));
+            GameResults.Instance.finalTaunt = ""; // Clear after use
+        }
     }
 
     public void PlayerSelectedMove(Move move)
@@ -60,21 +67,21 @@ public class GameManager : MonoBehaviour
         Move aiMove = aiManager.DecideMove(allMoves);
         Debug.Log($"AI played: {aiMove.name}");
 
-        string taunt = tauntGenerator.GenerateTaunt(currentRound);
+        string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
+        string outcomeType = GetOutcomeType(move.name, aiMove.name);
+
+        string dynamicTaunt = GenerateOutcomeTaunt(outcomeType);
 
         playerManager.AddMove(move);
         memoryLog.LogRound(currentRound, move, aiMove);
 
-        string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
-        string outcomeType = GetOutcomeType(move.name, aiMove.name);
-
         uiManager.AppendToRoundLog($"You played {move.name}, AI played {aiMove.name}", outcomeType);
         roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
 
-        // Store final data for reveal scene
+        // Store for FinalRevealScene
         GameResults.Instance.playerFinalMove = move;
         GameResults.Instance.aiFinalMove = aiMove;
-        GameResults.Instance.finalTaunt = taunt;  
+        GameResults.Instance.finalTaunt = dynamicTaunt;
 
         StartCoroutine(DelayedSceneSwitch());
     }
@@ -127,5 +134,24 @@ public class GameManager : MonoBehaviour
         else if (player == "Fracture" && ai == "Loop") return "win";
         else if (player == "Null" && ai == "Fracture") return "win";
         else return "loss";
+    }
+
+    
+    private string GenerateOutcomeTaunt(string outcome)
+    {
+        switch (outcome)
+        {
+            case "win": return "You win this round... but I see through you.";
+            case "loss": return "Defeated again. You should really try harder.";
+            case "tie": return "A draw? You're delaying the inevitable.";
+            default: return "Hmm... something unexpected.";
+        }
+    }
+
+    
+    private IEnumerator ShowDelayedTaunt(string taunt)
+    {
+        yield return new WaitForSeconds(1.2f);
+        uiManager.ShowAITaunt(taunt);
     }
 }
