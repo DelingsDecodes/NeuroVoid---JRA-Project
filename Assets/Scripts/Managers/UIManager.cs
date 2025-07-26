@@ -3,12 +3,14 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 
-// Manages UI interactions for Neurovoid Protocol: move buttons, round info, taunts, and summary panel.
+/// <summary>
+/// Manages UI for Neurovoid Protocol: move buttons, round info, taunts, and summary.
+/// </summary>
 public class UIManager : MonoBehaviour
 {
     public GameManager gameManager;
 
-    [Header("UI Container")]  
+    [Header("UI Container")]
     public GameObject mainUIContainer;
 
     [Header("Move Buttons")]
@@ -54,6 +56,7 @@ public class UIManager : MonoBehaviour
         for (int i = 0; i < moves.Length; i++)
         {
             int index = i;
+
             if (moveButtonLabels[i] != null)
                 moveButtonLabels[i].text = moves[i].name;
 
@@ -84,7 +87,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        StopAllCoroutines();
+        StopAllCoroutines(); 
         aiSpeechText.text = "";
         aiSpeechGroup.alpha = 0;
         aiSpeechGroup.gameObject.SetActive(true);
@@ -182,7 +185,6 @@ public class UIManager : MonoBehaviour
             roundLogScrollRect.verticalNormalizedPosition = 0f;
     }
 
-   
     public void HideUI()
     {
         if (mainUIContainer != null)
