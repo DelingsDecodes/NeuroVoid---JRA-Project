@@ -1,10 +1,9 @@
-﻿using UnityEngine;
+﻿// === FinalCardReveal.cs ===
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using UnityEngine.SceneManagement;
-
-//need changes 
 
 public class FinalCardReveal : MonoBehaviour
 {
@@ -47,13 +46,11 @@ public class FinalCardReveal : MonoBehaviour
     {
         yield return new WaitForSeconds(revealDelay);
 
-        // Flip backs
         LeanTween.scaleX(cardBack.gameObject, 0, flipDuration).setEaseInBack();
         LeanTween.scaleX(aiCardBack.gameObject, 0, flipDuration).setEaseInBack();
 
         yield return new WaitForSeconds(flipDuration);
 
-        // Hide backs and set artwork
         cardBack.gameObject.SetActive(false);
         aiCardBack.gameObject.SetActive(false);
 
@@ -63,41 +60,37 @@ public class FinalCardReveal : MonoBehaviour
         cardFront.gameObject.SetActive(true);
         aiCardFront.gameObject.SetActive(true);
 
-        // Flip fronts in
         LeanTween.scaleX(cardFront.gameObject, 1, flipDuration).setEaseOutBack();
         LeanTween.scaleX(aiCardFront.gameObject, 1, flipDuration).setEaseOutBack();
 
         yield return new WaitForSeconds(flipDuration);
 
-        // Show move names
         moveNameText.text = GameResults.Instance.playerFinalMove.name;
         aiMoveNameText.text = GameResults.Instance.aiFinalMove.name;
 
         moveNameText.gameObject.SetActive(true);
         aiMoveNameText.gameObject.SetActive(true);
 
-        yield return new WaitForSeconds(0.6f); 
+        yield return new WaitForSeconds(0.6f);
 
-        // Show taunt stored from GameManager
         if (tauntText != null)
         {
             tauntText.text = GameResults.Instance.finalTaunt;
             tauntText.gameObject.SetActive(true);
         }
 
-        // Wait, then go back to game or end
         yield return new WaitForSeconds(returnDelay);
 
         GameResults.Instance.currentRound++;
 
         if (GameResults.Instance.currentRound > GameResults.Instance.totalRounds)
         {
-            SceneManager.LoadScene("SummaryScene"); // or EndGameScene
+            SceneManager.LoadScene("SummaryScene");
         }
         else
         {
-            GameResults.Instance.ClearRoundMoves(); // reset taunt and moves
-            SceneManager.LoadScene("MainScene"); // go back to card selection
+            GameResults.Instance.ClearRoundMoves();
+            SceneManager.LoadScene("MainScene");
         }
     }
 }
