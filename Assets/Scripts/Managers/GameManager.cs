@@ -16,13 +16,15 @@ public class GameManager : MonoBehaviour
     public Move[] allMoves;
     private TauntGenerator tauntGenerator;
 
-    private int currentRound = 1;
-    private int totalRounds = 1;
+   
+    private int currentRound => GameResults.Instance.currentRound;
+    private int totalRounds => GameResults.Instance.totalRounds;
 
     void Start()
     {
         Debug.Log("GameManager Start() running");
 
+        // Safety check for missing references
         if (uiManager == null || playerManager == null || aiManager == null ||
             memoryLog == null || questionnaireManager == null || postGameSummary == null || roundResultDisplay == null)
         {
@@ -49,7 +51,7 @@ public class GameManager : MonoBehaviour
         if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt))
         {
             StartCoroutine(ShowDelayedTaunt(GameResults.Instance.finalTaunt));
-            GameResults.Instance.finalTaunt = ""; // Clear after use
+            GameResults.Instance.finalTaunt = ""; // Clear for next round
         }
     }
 
@@ -69,7 +71,6 @@ public class GameManager : MonoBehaviour
 
         string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
         string outcomeType = GetOutcomeType(move.name, aiMove.name);
-
         string dynamicTaunt = GenerateOutcomeTaunt(outcomeType);
 
         playerManager.AddMove(move);
@@ -136,7 +137,6 @@ public class GameManager : MonoBehaviour
         else return "loss";
     }
 
-    
     private string GenerateOutcomeTaunt(string outcome)
     {
         switch (outcome)
@@ -148,7 +148,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    
     private IEnumerator ShowDelayedTaunt(string taunt)
     {
         yield return new WaitForSeconds(1.2f);
