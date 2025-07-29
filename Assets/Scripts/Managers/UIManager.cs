@@ -36,6 +36,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI playerSpeechText;
 
     private Move[] availableMoves;
+    private bool buttonClicked = false;
 
     public void SetAvailableMoves(Move[] moves)
     {
@@ -52,6 +53,7 @@ public class UIManager : MonoBehaviour
         }
 
         availableMoves = moves;
+        buttonClicked = false;
 
         for (int i = 0; i < moves.Length; i++)
         {
@@ -62,6 +64,7 @@ public class UIManager : MonoBehaviour
 
             if (moveButtons[i] != null)
             {
+                moveButtons[i].interactable = true;
                 moveButtons[i].onClick.RemoveAllListeners();
                 moveButtons[i].onClick.AddListener(() => OnMoveButtonClicked(index));
             }
@@ -76,7 +79,20 @@ public class UIManager : MonoBehaviour
             return;
         }
 
+        if (buttonClicked) return;
+
+        buttonClicked = true;
+        DisableAllMoveButtons();
         gameManager.PlayerSelectedMove(availableMoves[index]);
+    }
+
+    private void DisableAllMoveButtons()
+    {
+        foreach (var btn in moveButtons)
+        {
+            if (btn != null)
+                btn.interactable = false;
+        }
     }
 
     public void ShowAITaunt(string taunt)
@@ -87,7 +103,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        StopAllCoroutines(); 
+        StopAllCoroutines();
         aiSpeechText.text = "";
         aiSpeechGroup.alpha = 0;
         aiSpeechGroup.gameObject.SetActive(true);
@@ -197,3 +213,4 @@ public class UIManager : MonoBehaviour
             mainUIContainer.SetActive(true);
     }
 }
+

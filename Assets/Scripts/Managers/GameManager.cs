@@ -16,7 +16,8 @@ public class GameManager : MonoBehaviour
     public Move[] allMoves;
     private TauntGenerator tauntGenerator;
 
-   
+    private bool moveChosen = false;
+
     private int currentRound => GameResults.Instance.currentRound;
     private int totalRounds => GameResults.Instance.totalRounds;
 
@@ -24,7 +25,10 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager Start() running");
 
-        // Safety check for missing references
+        // Reset move lock for new round
+        moveChosen = false;
+
+      
         if (uiManager == null || playerManager == null || aiManager == null ||
             memoryLog == null || questionnaireManager == null || postGameSummary == null || roundResultDisplay == null)
         {
@@ -47,7 +51,7 @@ public class GameManager : MonoBehaviour
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
         UnlockAllCards();
 
-        
+        // Display final taunt if carried over
         if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt))
         {
             StartCoroutine(ShowDelayedTaunt(GameResults.Instance.finalTaunt));
@@ -57,11 +61,19 @@ public class GameManager : MonoBehaviour
 
     public void PlayerSelectedMove(Move move)
     {
+        if (moveChosen)
+        {
+            Debug.LogWarning("GameManager: Player already chose a move this round.");
+            return;
+        }
+
         if (move == null)
         {
             Debug.LogError("GameManager: PlayerSelectedMove received a null move.");
             return;
         }
+
+        moveChosen = true; // Lock out further input
 
         Debug.Log($"Player selected: {move.name}");
 
@@ -79,7 +91,7 @@ public class GameManager : MonoBehaviour
         uiManager.AppendToRoundLog($"You played {move.name}, AI played {aiMove.name}", outcomeType);
         roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
 
-        // Store for FinalRevealScene
+        // Store data for next scene
         GameResults.Instance.playerFinalMove = move;
         GameResults.Instance.aiFinalMove = aiMove;
         GameResults.Instance.finalTaunt = dynamicTaunt;
