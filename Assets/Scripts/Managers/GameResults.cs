@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class GameResults : MonoBehaviour
 {
     public static GameResults Instance;
@@ -51,4 +53,12 @@ public class GameResults : MonoBehaviour
                $"AI played {aiFinalMove?.name}\n\n" +
                $"\"{finalTaunt}\"";
     }
+
+    public void ClearRoundMoves()
+{
+    playerFinalMove = null;
+    aiFinalMove = null;
+    finalTaunt = "";
+}
+
 }
