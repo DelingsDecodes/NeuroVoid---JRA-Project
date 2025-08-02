@@ -4,22 +4,37 @@ public class GameResults : MonoBehaviour
 {
     public static GameResults Instance;
 
+    [Header("Final Moves")]
     public Move playerFinalMove;
     public Move aiFinalMove;
     public string finalTaunt = "";
 
+    [Header("Round Management")]
     public int currentRound = 1;
     public int totalRounds = 5;
 
     private void Awake()
     {
+       
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+        }
     }
+
+
+    public void ClearRoundMoves()
+    {
+        playerFinalMove = null;
+        aiFinalMove = null;
+        finalTaunt = "";
+    }
+
 
     public void Reset()
     {
@@ -31,12 +46,15 @@ public class GameResults : MonoBehaviour
 
     public string GetFinalResult()
     {
-        if (playerFinalMove == null || aiFinalMove == null) return "No Result";
+        if (playerFinalMove == null || aiFinalMove == null)
+            return "No Result";
 
         string player = playerFinalMove.name;
         string ai = aiFinalMove.name;
 
-        if (player == ai) return "Draw";
+        if (player == ai)
+            return "Draw";
+
         if ((player == "Surge" && ai == "Null") ||
             (player == "Disrupt" && ai == "Surge") ||
             (player == "Loop" && ai == "Disrupt") ||
@@ -47,18 +65,13 @@ public class GameResults : MonoBehaviour
             return "Defeat...";
     }
 
+   
     public string GetSummary()
     {
-        return $"Final Round:\nYou played {playerFinalMove?.name}\n" +
-               $"AI played {aiFinalMove?.name}\n\n" +
-               $"\"{finalTaunt}\"";
+        string player = playerFinalMove != null ? playerFinalMove.name : "Unknown";
+        string ai = aiFinalMove != null ? aiFinalMove.name : "Unknown";
+        string taunt = string.IsNullOrEmpty(finalTaunt) ? "No taunt." : $"\"{finalTaunt}\"";
+
+        return $"Final Round:\nYou played {player}\nAI played {ai}\n\n{taunt}";
     }
-
-    public void ClearRoundMoves()
-{
-    playerFinalMove = null;
-    aiFinalMove = null;
-    finalTaunt = "";
-}
-
 }
