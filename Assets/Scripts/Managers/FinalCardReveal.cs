@@ -1,5 +1,4 @@
-﻿// === FinalCardReveal.cs ===
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
@@ -21,11 +20,10 @@ public class FinalCardReveal : MonoBehaviour
     public TextMeshProUGUI tauntText;
     public float revealDelay = 1.0f;
     public float flipDuration = 0.2f;
-    public float returnDelay = 1.5f; // time to wait after taunt before returning
+    public float returnDelay = 1.5f;
 
     void Start()
     {
-        // Hide fronts and prepare for flip
         SetupCard(cardFront);
         SetupCard(aiCardFront);
 
@@ -81,6 +79,7 @@ public class FinalCardReveal : MonoBehaviour
 
         yield return new WaitForSeconds(returnDelay);
 
+        GameResults.Instance.AddRoundToHistory();
         GameResults.Instance.currentRound++;
 
         if (GameResults.Instance.currentRound > GameResults.Instance.totalRounds)
