@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/FinalRevealScene.unity
     guid: 760ae23d2ab8896479ad92549ba2498b
+  - enabled: 1
+    path: Assets/Scenes/SummaryScene.unity
+    guid: 45322bbf645e17a4fb5aa2ec6cc453cf
   m_configObjects: {}

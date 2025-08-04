@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class GameResults : MonoBehaviour
 {
@@ -13,9 +14,10 @@ public class GameResults : MonoBehaviour
     public int currentRound = 1;
     public int totalRounds = 5;
 
+    public List<string> roundHistory = new List<string>();
+
     private void Awake()
     {
-       
         if (Instance == null)
         {
             Instance = this;
@@ -27,7 +29,6 @@ public class GameResults : MonoBehaviour
         }
     }
 
-
     public void ClearRoundMoves()
     {
         playerFinalMove = null;
@@ -35,13 +36,13 @@ public class GameResults : MonoBehaviour
         finalTaunt = "";
     }
 
-
     public void Reset()
     {
         playerFinalMove = null;
         aiFinalMove = null;
         finalTaunt = "";
         currentRound = 1;
+        roundHistory.Clear();
     }
 
     public string GetFinalResult()
@@ -65,7 +66,6 @@ public class GameResults : MonoBehaviour
             return "Defeat...";
     }
 
-   
     public string GetSummary()
     {
         string player = playerFinalMove != null ? playerFinalMove.name : "Unknown";
@@ -73,5 +73,14 @@ public class GameResults : MonoBehaviour
         string taunt = string.IsNullOrEmpty(finalTaunt) ? "No taunt." : $"\"{finalTaunt}\"";
 
         return $"Final Round:\nYou played {player}\nAI played {ai}\n\n{taunt}";
+    }
+
+    public void AddRoundToHistory()
+    {
+        if (playerFinalMove != null && aiFinalMove != null)
+        {
+            string entry = $"Round {currentRound}: You - {playerFinalMove.name} | AI - {aiFinalMove.name}";
+            roundHistory.Add(entry);
+        }
     }
 }

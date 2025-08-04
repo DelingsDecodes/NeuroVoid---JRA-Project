@@ -25,10 +25,8 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("GameManager Start() running");
 
-        // Reset move lock for new round
         moveChosen = false;
 
-      
         if (uiManager == null || playerManager == null || aiManager == null ||
             memoryLog == null || questionnaireManager == null || postGameSummary == null || roundResultDisplay == null)
         {
@@ -51,11 +49,10 @@ public class GameManager : MonoBehaviour
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
         UnlockAllCards();
 
-        // Display final taunt if carried over
         if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt))
         {
             StartCoroutine(ShowDelayedTaunt(GameResults.Instance.finalTaunt));
-            GameResults.Instance.finalTaunt = ""; // Clear for next round
+            GameResults.Instance.finalTaunt = "";
         }
     }
 
@@ -73,13 +70,15 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        moveChosen = true; // Lock out further input
+        moveChosen = true;
 
         Debug.Log($"Player selected: {move.name}");
 
         aiManager.ObservePlayerMove(move);
         Move aiMove = aiManager.DecideMove(allMoves);
-        Debug.Log($"AI played: {aiMove.name}");
+
+        Debug.Log($"AI played: {aiMove?.name}");
+        Debug.Log($"AI move artwork is null: {aiMove?.artwork == null}");
 
         string outcomeMessage = GetRoundOutcome(move.name, aiMove.name);
         string outcomeType = GetOutcomeType(move.name, aiMove.name);
@@ -91,7 +90,6 @@ public class GameManager : MonoBehaviour
         uiManager.AppendToRoundLog($"You played {move.name}, AI played {aiMove.name}", outcomeType);
         roundResultDisplay.ShowResult(move.name, aiMove.name, outcomeMessage);
 
-        // Store data for next scene
         GameResults.Instance.playerFinalMove = move;
         GameResults.Instance.aiFinalMove = aiMove;
         GameResults.Instance.finalTaunt = dynamicTaunt;
