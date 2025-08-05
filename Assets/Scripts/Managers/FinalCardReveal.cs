@@ -17,10 +17,12 @@ public class FinalCardReveal : MonoBehaviour
     public TextMeshProUGUI aiMoveNameText;
 
     [Header("Post Flip")]
-    public TextMeshProUGUI tauntText;
     public float revealDelay = 1.0f;
     public float flipDuration = 0.2f;
     public float returnDelay = 1.5f;
+
+    [Header("Taunt Bubble UI")]
+    public UIManager uiManager;
 
     void Start()
     {
@@ -29,7 +31,6 @@ public class FinalCardReveal : MonoBehaviour
 
         moveNameText.gameObject.SetActive(false);
         aiMoveNameText.gameObject.SetActive(false);
-        if (tauntText != null) tauntText.gameObject.SetActive(false);
 
         StartCoroutine(FlipBothCards());
     }
@@ -71,10 +72,13 @@ public class FinalCardReveal : MonoBehaviour
 
         yield return new WaitForSeconds(0.6f);
 
-        if (tauntText != null)
+     
+        if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt))
         {
-            tauntText.text = GameResults.Instance.finalTaunt;
-            tauntText.gameObject.SetActive(true);
+            if (uiManager != null)
+            {
+                uiManager.ShowAITaunt(GameResults.Instance.finalTaunt);
+            }
         }
 
         yield return new WaitForSeconds(returnDelay);

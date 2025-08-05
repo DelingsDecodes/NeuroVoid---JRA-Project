@@ -1789,8 +1789,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -114.92, y: -226}
-  m_SizeDelta: {x: 325, y: 180}
+  m_AnchoredPosition: {x: -132.03, y: -244.31}
+  m_SizeDelta: {x: 359.23, y: 216.61}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &854308385
 CanvasGroup:
@@ -2601,7 +2601,7 @@ MonoBehaviour:
   - {fileID: 1462194928}
   - {fileID: 571367487}
   - {fileID: 1542238265}
-  aiTauntText: {fileID: 318548301}
+  aiTauntText: {fileID: 1825056383}
   roundCounterText: {fileID: 1947001020}
   roundLogText: {fileID: 1454812063}
   roundLogScrollRect: {fileID: 2048316749}
@@ -2841,51 +2841,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1127244466}
   m_CullTransparentMesh: 1
---- !u!1 &1220544472
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1220544474}
-  - component: {fileID: 1220544473}
-  m_Layer: 0
-  m_Name: RoundCounterUI
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1220544473
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1220544472}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0abdb3dfe54e6b74c8bd145048b5d07e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roundText: {fileID: 1362655553}
---- !u!4 &1220544474
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1220544472}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 267.32513, y: 398.33005, z: -9.2918825}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1359402500
 GameObject:
   m_ObjectHideFlags: 0
@@ -4813,16 +4768,16 @@ RectTransform:
   m_GameObject: {fileID: 1825056381}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 854308384}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 162.50002, y: -79.635315}
-  m_SizeDelta: {x: 200, y: 60}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: -1, y: 1}
+  m_AnchorMax: {x: -1, y: 1}
+  m_AnchoredPosition: {x: 860.40906, y: -100.174255}
+  m_SizeDelta: {x: 213.4091, y: 82.3485}
+  m_Pivot: {x: -1, y: 0.5}
 --- !u!114 &1825056383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4853,7 +4808,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 0.6226415, g: 0.15566038, b: 0.15566038, a: 1}
+  m_fontColor: {r: 0.21698111, g: 0.12384299, b: 0.12384299, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -6641,4 +6596,3 @@ SceneRoots:
   - {fileID: 859510227}
   - {fileID: 849899684}
   - {fileID: 251473358}
-  - {fileID: 1220544474}
