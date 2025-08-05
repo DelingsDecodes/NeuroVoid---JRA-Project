@@ -49,10 +49,12 @@ public class GameManager : MonoBehaviour
         uiManager.UpdateRoundCounter(currentRound, totalRounds);
         UnlockAllCards();
 
+      
         if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt))
         {
+            Debug.Log("GameManager: Displaying AI taunt from previous round.");
             StartCoroutine(ShowDelayedTaunt(GameResults.Instance.finalTaunt));
-            GameResults.Instance.finalTaunt = "";
+            GameResults.Instance.finalTaunt = ""; 
         }
     }
 
