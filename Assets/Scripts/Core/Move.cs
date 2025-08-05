@@ -1,25 +1,22 @@
 using System;
 using UnityEngine;
 
-using System;
-using UnityEngine;
-
 [Serializable]
 public class Move
 {
-    public string name;          
-    public string description;    
-    public MoveType type;       
+    public string name;            
+    public string description;     
+    public MoveType type;          
 
     [NonSerialized]
-    public Sprite artwork;        
+    public Sprite artwork;         
 }
 
 public enum MoveType
 {
-    Aggression = 0,    // Direct attack (Surge)
-    Control = 1,       // Disruption (Disrupt)
-    Loop = 2,          // Repetition (Loop)
-    Reflection = 3,    // Bounce-back (Fracture)
-    Bluff = 4          // Fake-out (Null)
+    Aggression,    // For moves like "Surge"
+    Control,       // For moves like "Disrupt"
+    Bluff,         // For moves like "Loop"
+    Reflection,    // For moves like "Fracture"
+    Defense        // For moves like "Null"
 }
