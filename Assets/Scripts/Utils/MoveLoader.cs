@@ -14,32 +14,25 @@ public static class MoveLoader
         }
 
         string json = File.ReadAllText(filePath);
-        MoveList moveList = JsonUtility.FromJson<MoveList>("{\"moves\":" + json + "}");
+        Move[] moves = JsonHelper.FromJson<Move>(json);
 
-        if (moveList == null || moveList.moves == null || moveList.moves.Length == 0)
+        if (moves == null || moves.Length == 0)
         {
             Debug.LogError("MoveLoader: Failed to parse or no moves found.");
             return null;
         }
 
-        foreach (var move in moveList.moves)
+        foreach (var move in moves)
         {
-           
-
             move.artwork = Resources.Load<Sprite>("CardArt/" + move.name);
-
             if (move.artwork == null)
             {
                 Debug.LogWarning($"MoveLoader: No sprite found for {move.name} in Resources/CardArt/");
             }
         }
 
-        return moveList.moves;
-    }
-
-    [System.Serializable]
-    private class MoveList
-    {
-        public Move[] moves;
+        return moves;
     }
 }
+
+    
