@@ -185,12 +185,12 @@ public class QuestionnaireManager : MonoBehaviour
             fadeCanvas.alpha = 1f;
         }
 
-        SceneManager.LoadScene("MainScene");
+        SceneManager.LoadScene("StaircaseScene");
     }
 
     public void ContinueToGame()
     {
-        SceneManager.LoadScene("MainScene");
+        SceneManager.LoadScene("StaircaseScene");
     }
 
     public PlayerProfile GetProfile()
