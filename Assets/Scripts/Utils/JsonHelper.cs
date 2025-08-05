@@ -15,14 +15,13 @@ public static class JsonHelper
         return JsonUtility.ToJson(wrapper, prettyPrint);
     }
 
-   
     [Serializable]
     private class Wrapper<T>
     {
         public T[] Items;
     }
 
-    // Adds a root object if the JSON is a raw array
+    
     private static string FixJson(string value)
     {
         if (!value.TrimStart().StartsWith("{"))
