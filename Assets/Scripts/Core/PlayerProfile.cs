@@ -3,6 +3,8 @@ using UnityEngine;
 
 [Serializable]
 public class PlayerProfile
+
+// Needs updating
 {
     [Header("Psychological Traits")]
     public bool prefersAggression;      // Tends to use forceful or direct moves
