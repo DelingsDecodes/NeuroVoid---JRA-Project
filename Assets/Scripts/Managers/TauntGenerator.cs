@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+
+//need to herd code this
 public class TauntGenerator
 {
     private PlayerProfile profile;
