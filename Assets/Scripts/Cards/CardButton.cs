@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-
+//check functionality
 public class CardButton : MonoBehaviour
 {
     public string moveName; // e.g., "Surge", "Loop", etc.
