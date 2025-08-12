@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-//currently Doesnt work
+//trying to use JSON 
 [Serializable]
 public class Move
 {
