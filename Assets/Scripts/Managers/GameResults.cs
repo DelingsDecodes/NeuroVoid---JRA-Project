@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 public class GameResults : MonoBehaviour
@@ -13,8 +13,11 @@ public class GameResults : MonoBehaviour
     [Header("Round Management")]
     public int currentRound = 1;
     public int totalRounds = 5;
-
     public List<string> roundHistory = new List<string>();
+
+    private int winCount = 0;
+    private int lossCount = 0;
+    private int tieCount = 0;
 
     private void Awake()
     {
@@ -42,7 +45,43 @@ public class GameResults : MonoBehaviour
         aiFinalMove = null;
         finalTaunt = "";
         currentRound = 1;
+
+        winCount = 0;
+        lossCount = 0;
+        tieCount = 0;
+
         roundHistory.Clear();
+    }
+
+    public void AddRoundToHistory()
+    {
+        if (playerFinalMove != null && aiFinalMove != null)
+        {
+            string player = playerFinalMove.name;
+            string ai = aiFinalMove.name;
+            string outcome = EvaluateOutcome(player, ai);
+
+            if (outcome == "win") winCount++;
+            else if (outcome == "loss") lossCount++;
+            else tieCount++;
+
+            string entry = $"Round {currentRound}: You - {player} | AI - {ai} → {outcome.ToUpper()}";
+            roundHistory.Add(entry);
+        }
+    }
+
+    private string EvaluateOutcome(string player, string ai)
+    {
+        if (player == ai) return "tie";
+
+        if ((player == "Surge" && ai == "Null") ||
+            (player == "Disrupt" && ai == "Surge") ||
+            (player == "Loop" && ai == "Disrupt") ||
+            (player == "Fracture" && ai == "Loop") ||
+            (player == "Null" && ai == "Fracture"))
+            return "win";
+
+        return "loss";
     }
 
     public string GetFinalResult()
@@ -50,20 +89,14 @@ public class GameResults : MonoBehaviour
         if (playerFinalMove == null || aiFinalMove == null)
             return "No Result";
 
-        string player = playerFinalMove.name;
-        string ai = aiFinalMove.name;
-
-        if (player == ai)
-            return "Draw";
-
-        if ((player == "Surge" && ai == "Null") ||
-            (player == "Disrupt" && ai == "Surge") ||
-            (player == "Loop" && ai == "Disrupt") ||
-            (player == "Fracture" && ai == "Loop") ||
-            (player == "Null" && ai == "Fracture"))
-            return "Victory!";
-        else
-            return "Defeat...";
+        string outcome = EvaluateOutcome(playerFinalMove.name, aiFinalMove.name);
+        return outcome switch
+        {
+            "win" => "Victory!",
+            "loss" => "Defeat...",
+            "tie" => "Draw",
+            _ => "Unclear"
+        };
     }
 
     public string GetSummary()
@@ -75,12 +108,28 @@ public class GameResults : MonoBehaviour
         return $"Final Round:\nYou played {player}\nAI played {ai}\n\n{taunt}";
     }
 
-    public void AddRoundToHistory()
+    public string GetAdvancedSummary()
     {
-        if (playerFinalMove != null && aiFinalMove != null)
-        {
-            string entry = $"Round {currentRound}: You - {playerFinalMove.name} | AI - {aiFinalMove.name}";
-            roundHistory.Add(entry);
-        }
+        int total = winCount + lossCount + tieCount;
+        float winRate = total > 0 ? (winCount / (float)total) * 100f : 0f;
+        float tieRate = total > 0 ? (tieCount / (float)total) * 100f : 0f;
+
+        string summary = $"=== Protocol Summary ===\n" +
+                         $"Rounds Played: {total}\n" +
+                         $"Wins: {winCount}, Losses: {lossCount}, Ties: {tieCount}\n" +
+                         $"Win Rate: {winRate:F1}%\n" +
+                         $"Tie Frequency: {tieRate:F1}%\n\n";
+
+        if (!string.IsNullOrEmpty(finalTaunt))
+            summary += $"AI's Last Remark:\n\"{finalTaunt}\"\n\n";
+
+        summary += ">>> This data feeds the next evolution. Prepare yourself.\n";
+
+        return summary;
+    }
+
+    public List<string> GetFullHistory()
+    {
+        return roundHistory;
     }
 }
