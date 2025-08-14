@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-//need fixing
+
 public class SummarySceneManager : MonoBehaviour
 {
     public TextMeshProUGUI summaryText;
@@ -10,16 +10,25 @@ public class SummarySceneManager : MonoBehaviour
 
     void Start()
     {
-        if (summaryText != null)
-            summaryText.text = GameResults.Instance.GetSummary();
+        if (GameResults.Instance == null)
+        {
+            Debug.LogWarning("SummarySceneManager: GameResults instance not found.");
+            return;
+        }
 
+        if (summaryText != null)
+            summaryText.text = GameResults.Instance.GetAdvancedSummary();
+
+      
         if (resultText != null)
             resultText.text = GameResults.Instance.GetFinalResult();
     }
 
     public void RestartGame()
     {
-        GameResults.Instance.Reset();
+        if (GameResults.Instance != null)
+            GameResults.Instance.Reset();
+
         SceneManager.LoadScene("MainScene");
     }
 
