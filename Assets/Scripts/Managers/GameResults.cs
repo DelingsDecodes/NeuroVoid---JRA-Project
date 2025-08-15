@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+
 public class GameResults : MonoBehaviour
 {
     public static GameResults Instance;
@@ -32,6 +33,7 @@ public class GameResults : MonoBehaviour
         }
     }
 
+
     public void ClearRoundMoves()
     {
         playerFinalMove = null;
@@ -52,6 +54,7 @@ public class GameResults : MonoBehaviour
 
         roundHistory.Clear();
     }
+
 
     public void AddRoundToHistory()
     {
@@ -84,6 +87,7 @@ public class GameResults : MonoBehaviour
         return "loss";
     }
 
+  
     public string GetFinalResult()
     {
         if (playerFinalMove == null || aiFinalMove == null)
@@ -114,20 +118,21 @@ public class GameResults : MonoBehaviour
         float winRate = total > 0 ? (winCount / (float)total) * 100f : 0f;
         float tieRate = total > 0 ? (tieCount / (float)total) * 100f : 0f;
 
-        string summary = $"=== Protocol Summary ===\n" +
+        string summary = $"<b>=== Protocol Summary ===</b>\n" +
                          $"Rounds Played: {total}\n" +
                          $"Wins: {winCount}, Losses: {lossCount}, Ties: {tieCount}\n" +
                          $"Win Rate: {winRate:F1}%\n" +
                          $"Tie Frequency: {tieRate:F1}%\n\n";
 
         if (!string.IsNullOrEmpty(finalTaunt))
-            summary += $"AI's Last Remark:\n\"{finalTaunt}\"\n\n";
+            summary += $"<i>AI’s Final Remark:</i>\n\"{finalTaunt}\"\n\n";
 
-        summary += ">>> This data feeds the next evolution. Prepare yourself.\n";
+        summary += ">>> Analysis Complete. Neural patterns archived. Awaiting next duel...\n";
 
         return summary;
     }
 
+   
     public List<string> GetFullHistory()
     {
         return roundHistory;
