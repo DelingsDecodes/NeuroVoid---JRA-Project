@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class QuestionnaireManager : MonoBehaviour
 {
+    //remove the fade out
     [SerializeField] private GameObject questionnairePanel;
     [SerializeField] private TextMeshProUGUI questionText;
     [SerializeField] private Button optionAButton;
