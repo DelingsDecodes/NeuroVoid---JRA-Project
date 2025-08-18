@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-
 public class GameResults : MonoBehaviour
 {
     public static GameResults Instance;
@@ -33,7 +32,6 @@ public class GameResults : MonoBehaviour
         }
     }
 
-
     public void ClearRoundMoves()
     {
         playerFinalMove = null;
@@ -47,14 +45,11 @@ public class GameResults : MonoBehaviour
         aiFinalMove = null;
         finalTaunt = "";
         currentRound = 1;
-
         winCount = 0;
         lossCount = 0;
         tieCount = 0;
-
         roundHistory.Clear();
     }
-
 
     public void AddRoundToHistory()
     {
@@ -87,7 +82,6 @@ public class GameResults : MonoBehaviour
         return "loss";
     }
 
-  
     public string GetFinalResult()
     {
         if (playerFinalMove == null || aiFinalMove == null)
@@ -132,7 +126,6 @@ public class GameResults : MonoBehaviour
         return summary;
     }
 
-   
     public List<string> GetFullHistory()
     {
         return roundHistory;
