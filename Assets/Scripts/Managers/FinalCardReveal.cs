@@ -47,7 +47,6 @@ public class FinalCardReveal : MonoBehaviour
 
         LeanTween.scaleX(cardBack.gameObject, 0, flipDuration).setEaseInBack();
         LeanTween.scaleX(aiCardBack.gameObject, 0, flipDuration).setEaseInBack();
-
         yield return new WaitForSeconds(flipDuration);
 
         cardBack.gameObject.SetActive(false);
@@ -61,7 +60,6 @@ public class FinalCardReveal : MonoBehaviour
 
         LeanTween.scaleX(cardFront.gameObject, 1, flipDuration).setEaseOutBack();
         LeanTween.scaleX(aiCardFront.gameObject, 1, flipDuration).setEaseOutBack();
-
         yield return new WaitForSeconds(flipDuration);
 
         moveNameText.text = GameResults.Instance.playerFinalMove.name;
@@ -70,26 +68,21 @@ public class FinalCardReveal : MonoBehaviour
         moveNameText.gameObject.SetActive(true);
         aiMoveNameText.gameObject.SetActive(true);
 
-        yield return new WaitForSeconds(0.6f);
-
-     
-        if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt))
+        
+        if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt) && uiManager != null)
         {
-            if (uiManager != null)
-            {
-                uiManager.ShowAITaunt(GameResults.Instance.finalTaunt);
-            }
+            yield return new WaitForSeconds(0.5f);
+            uiManager.ShowAITaunt(GameResults.Instance.finalTaunt);
+            yield return new WaitForSeconds(2.5f); 
         }
-
-        yield return new WaitForSeconds(returnDelay);
 
         GameResults.Instance.AddRoundToHistory();
         GameResults.Instance.currentRound++;
 
+        yield return new WaitForSeconds(returnDelay);
+
         if (GameResults.Instance.currentRound > GameResults.Instance.totalRounds)
-        {
             SceneManager.LoadScene("SummaryScene");
-        }
         else
         {
             GameResults.Instance.ClearRoundMoves();
