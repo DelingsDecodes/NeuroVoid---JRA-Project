@@ -19,10 +19,11 @@ public class FinalCardReveal : MonoBehaviour
     [Header("Post Flip")]
     public float revealDelay = 1.0f;
     public float flipDuration = 0.2f;
-    public float returnDelay = 1.5f;
 
-    [Header("Taunt Bubble UI")]
+    [Header("UI")]
     public UIManager uiManager;
+
+    private float tauntDuration = 5.5f; 
 
     void Start()
     {
@@ -67,22 +68,26 @@ public class FinalCardReveal : MonoBehaviour
 
         moveNameText.gameObject.SetActive(true);
         aiMoveNameText.gameObject.SetActive(true);
+        yield return new WaitForSeconds(0.6f);
 
         
         if (!string.IsNullOrEmpty(GameResults.Instance.finalTaunt) && uiManager != null)
         {
-            yield return new WaitForSeconds(0.5f);
             uiManager.ShowAITaunt(GameResults.Instance.finalTaunt);
-            yield return new WaitForSeconds(2.5f); 
+            yield return new WaitForSeconds(tauntDuration);
+        }
+        else
+        {
+            yield return new WaitForSeconds(1.5f); 
         }
 
         GameResults.Instance.AddRoundToHistory();
         GameResults.Instance.currentRound++;
 
-        yield return new WaitForSeconds(returnDelay);
-
         if (GameResults.Instance.currentRound > GameResults.Instance.totalRounds)
+        {
             SceneManager.LoadScene("SummaryScene");
+        }
         else
         {
             GameResults.Instance.ClearRoundMoves();
