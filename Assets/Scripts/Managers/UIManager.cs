@@ -3,9 +3,6 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 
-/// <summary>
-/// Manages UI for Neurovoid Protocol: move buttons, round info, taunts, and summary.
-/// </summary>
 public class UIManager : MonoBehaviour
 {
     public GameManager gameManager;
@@ -38,6 +35,7 @@ public class UIManager : MonoBehaviour
     private Move[] availableMoves;
     private bool buttonClicked = false;
 
+ 
     public void SetAvailableMoves(Move[] moves)
     {
         if (moves == null || moves.Length == 0)
@@ -95,6 +93,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
+
     public void ShowAITaunt(string taunt)
     {
         if (aiSpeechText == null || aiSpeechGroup == null)
@@ -151,31 +150,10 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void DisplayAITaunt(string taunt)
-    {
-        if (aiTauntText != null)
-            aiTauntText.text = taunt;
-        else
-            Debug.LogWarning("UIManager: aiTauntText not assigned.");
-    }
-
     public void UpdateRoundCounter(int round, int total)
     {
         if (roundCounterText != null)
             roundCounterText.text = $"Round {round} / {total}";
-    }
-
-    public void DisplaySummary(string summary)
-    {
-        if (summaryPanel != null && summaryText != null)
-        {
-            summaryPanel.SetActive(true);
-            summaryText.text = summary;
-        }
-        else
-        {
-            Debug.LogWarning("UIManager: Summary panel or text not assigned.");
-        }
     }
 
     public void AppendToRoundLog(string roundInfo, string outcome)
@@ -201,6 +179,29 @@ public class UIManager : MonoBehaviour
             roundLogScrollRect.verticalNormalizedPosition = 0f;
     }
 
+ 
+    public void DisplaySummary(string summary)
+    {
+        if (summaryPanel != null && summaryText != null)
+        {
+            summaryPanel.SetActive(true);
+            summaryText.text = summary;
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: Summary panel or text not assigned.");
+        }
+    }
+
+   
+    public void DisplayAITaunt(string taunt)
+    {
+        if (aiTauntText != null)
+            aiTauntText.text = taunt;
+        else
+            Debug.LogWarning("UIManager: aiTauntText not assigned.");
+    }
+
     public void HideUI()
     {
         if (mainUIContainer != null)
@@ -213,4 +214,3 @@ public class UIManager : MonoBehaviour
             mainUIContainer.SetActive(true);
     }
 }
-
