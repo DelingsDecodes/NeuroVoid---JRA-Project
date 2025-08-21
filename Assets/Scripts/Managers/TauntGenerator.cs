@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Linq;
 
 
+//doesnt work
+
 //need to herd code this
 public class TauntGenerator
 {
@@ -27,17 +29,17 @@ public class TauntGenerator
 
         if (mostUsed != null && mostUsed.Count() >= 3)
         {
-            taunt += $"Still clinging to {mostUsed.Key}? That’s the third time... predictable.\n";
+            taunt += $"Still clinging to {mostUsed.Key}? Thatâ€™s the third time... predictable.\n";
         }
 
         if (profile.prefersAggression && memoryLog.GetPassiveMoveRate() > 0.5f)
         {
-            taunt += "Weren’t you the aggressive type? You keep holding back.\n";
+            taunt += "Werenâ€™t you the aggressive type? You keep holding back.\n";
         }
 
         if (profile.oftenBluffs && memoryLog.HasStraightPattern())
         {
-            taunt += "I expected trickery… but you’ve been oddly honest lately.\n";
+            taunt += "I expected trickeryâ€¦ but youâ€™ve been oddly honest lately.\n";
         }
 
         if (string.IsNullOrEmpty(taunt))
@@ -56,7 +58,7 @@ public class TauntGenerator
             "This duel is more transparent than you think.",
             "You repeat patterns even when I give you chances.",
             "You're playing checkers while I'm playing psychology.",
-            "Your mind is an open book and I’ve already read the ending."
+            "Your mind is an open book and Iâ€™ve already read the ending."
         };
 
         return genericTaunts[Random.Range(0, genericTaunts.Length)];
