@@ -3,6 +3,9 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 
+//check tautns
+
+
 public class UIManager : MonoBehaviour
 {
     public GameManager gameManager;
