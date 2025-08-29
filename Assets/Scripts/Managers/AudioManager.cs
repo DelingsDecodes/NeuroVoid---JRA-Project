@@ -2,6 +2,7 @@ using UnityEngine;
 
 
 // Handles all audio playback: ambient background, glitch effects, voice taunts.
+//future / in progress
 
 public class AudioManager : MonoBehaviour
 {
